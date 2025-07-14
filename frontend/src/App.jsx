@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area
+  BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, ScatterChart, Scatter,
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ComposedChart
 } from 'recharts';
 import Papa from 'papaparse';
 import { 
   HiOutlineFilter, HiOutlineMap, HiOutlineXCircle, HiOutlineCheckCircle, 
   HiOutlineTrendingUp, HiOutlineCalendar, HiOutlineGlobe, HiOutlineCurrencyDollar,
-  HiOutlineUsers, HiOutlineBriefcase, HiOutlineChartBar, HiOutlineRefresh
+  HiOutlineUsers, HiOutlineBriefcase, HiOutlineChartBar, HiOutlineRefresh,
+  HiOutlineUserGroup, HiOutlineAcademicCap, HiOutlineClock, HiOutlineSparkles,
+  HiOutlineCollection
 } from 'react-icons/hi';
 
 // Paleta de colores para las líneas del gráfico
@@ -29,6 +32,23 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeDataset, setActiveDataset] = useState('employment');
+  
+  // Nuevos filtros avanzados
+  const [selectedSex, setSelectedSex] = useState('Total');
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState('15+');
+  const [selectedYearRange, setSelectedYearRange] = useState([2015, 2024]);
+  const [availableYears, setAvailableYears] = useState([]);
+  const [availableSexOptions, setAvailableSexOptions] = useState(['Total']);
+  const [availableAgeGroups, setAvailableAgeGroups] = useState(['15+']);
+  
+  // Estado para controlar qué gráficos mostrar
+  const [activeCharts, setActiveCharts] = useState({
+    timeSeries: true,
+    comparison: true,
+    distribution: true,
+    scatter: true,
+    radar: true
+  });
 
   // Configuración de datasets
   const datasets = {
@@ -69,9 +89,25 @@ const Dashboard = () => {
     }
   };
 
-  // Función para procesar datos CSV
+  // Función para procesar datos CSV con filtros avanzados
   const processCSVData = (data, dataType) => {
+    // Validar que data existe y es un array
+    if (!data || !Array.isArray(data)) {
+      console.warn(`No data provided for ${dataType}`);
+      return { 
+        processedData: [], 
+        countries: [],
+        sexOptions: ['Total'],
+        ageGroups: ['15+'],
+        years: []
+      };
+    }
+
     const countrySet = new Set();
+    const sexSet = new Set();
+    const ageGroupSet = new Set();
+    const yearSet = new Set();
+    
     const southAmericaList = [
       'Argentina', 'Bolivia (Plurinational State of)', 'Brazil', 'Chile', 'Colombia',
       'Ecuador', 'Guyana', 'Paraguay', 'Peru', 'Suriname',
@@ -79,31 +115,49 @@ const Dashboard = () => {
     ];
 
     const processedData = data
+      .filter(row => row && typeof row === 'object') // Filtrar filas válidas
       .map(row => ({
-        country: row['ref_area.label'],
+        country: row['ref_area.label'] || '',
         year: parseInt(row.time, 10),
         value: parseFloat(row.obs_value),
-        sex: row['sex.label'],
-        currency: row['classif1.label'] || 'N/A'
+        sex: row['sex.label'] || 'Total',
+        ageGroup: row['classif1.label'] || '',
+        currency: row['classif1.label'] || 'N/A',
+        indicator: row['indicator.label'] || ''
       }))
       .filter(row => {
+        // Validar datos básicos
+        if (!row.country || isNaN(row.year) || isNaN(row.value)) {
+          return false;
+        }
+
         const isSouthAmerican = southAmericaList.includes(row.country);
         if (isSouthAmerican) {
           countrySet.add(row.country);
+          if (row.sex) sexSet.add(row.sex);
+          yearSet.add(row.year);
+          
+          // Extraer grupos de edad para datasets que los tienen
+          if (dataType !== 'salary' && row.ageGroup && row.ageGroup.includes('Age')) {
+            ageGroupSet.add(row.ageGroup);
+          }
         }
         
         // Para salarios, filtrar por USD
         if (dataType === 'salary') {
-          return row.country && !isNaN(row.year) && !isNaN(row.value) && 
-                 row.sex === 'Total' && isSouthAmerican && 
-                 row.currency && row.currency.includes('U.S. dollars');
+          return isSouthAmerican && row.currency && row.currency.includes('U.S. dollars');
         }
         
-        return row.country && !isNaN(row.year) && !isNaN(row.value) && 
-               row.sex === 'Total' && isSouthAmerican;
+        return isSouthAmerican;
       });
 
-    return { processedData, countries: Array.from(countrySet) };
+    return { 
+      processedData: processedData || [], 
+      countries: Array.from(countrySet),
+      sexOptions: Array.from(sexSet).length > 0 ? Array.from(sexSet) : ['Total'],
+      ageGroups: Array.from(ageGroupSet).length > 0 ? Array.from(ageGroupSet) : ['15+'],
+      years: Array.from(yearSet).sort((a, b) => a - b)
+    };
   };
 
   // Función para cargar un dataset específico
@@ -119,18 +173,36 @@ const Dashboard = () => {
         Papa.parse(csvText, {
           header: true,
           complete: (result) => {
-            const { processedData, countries } = processCSVData(result.data, datasetKey);
-            resolve({ data: processedData, countries });
+            const processed = processCSVData(result.data, datasetKey);
+            resolve({ 
+              data: processed.processedData || [], 
+              countries: processed.countries || [],
+              sexOptions: processed.sexOptions || ['Total'],
+              ageGroups: processed.ageGroups || ['15+'],
+              years: processed.years || []
+            });
           },
           error: (err) => {
             console.error(`Error processing ${datasetKey}:`, err);
-            resolve({ data: [], countries: [] });
+            resolve({ 
+              data: [], 
+              countries: [],
+              sexOptions: ['Total'],
+              ageGroups: ['15+'],
+              years: []
+            });
           }
         });
       });
     } catch (err) {
       console.error(`Error loading ${datasetKey}:`, err);
-      return { data: [], countries: [] };
+      return { 
+        data: [], 
+        countries: [],
+        sexOptions: ['Total'],
+        ageGroups: ['15+'],
+        years: []
+      };
     }
   };
 
@@ -153,23 +225,59 @@ const Dashboard = () => {
         setLaborForceData(laborForce.data);
         setSalaryData(salary.data);
 
-        // Combinar todos los países únicos
+        // Combinar todas las opciones disponibles
         const allCountries = new Set([
-          ...employment.countries,
-          ...unemployment.countries,
-          ...informal.countries,
-          ...laborForce.countries,
-          ...salary.countries
+          ...(employment.countries || []),
+          ...(unemployment.countries || []),
+          ...(informal.countries || []),
+          ...(laborForce.countries || []),
+          ...(salary.countries || [])
+        ]);
+        
+        const allSexOptions = new Set([
+          ...(employment.sexOptions || ['Total']),
+          ...(unemployment.sexOptions || ['Total']),
+          ...(informal.sexOptions || ['Total']),
+          ...(laborForce.sexOptions || ['Total']),
+          ...(salary.sexOptions || ['Total'])
+        ]);
+        
+        const allAgeGroups = new Set([
+          ...(employment.ageGroups || ['15+']),
+          ...(unemployment.ageGroups || ['15+']),
+          ...(informal.ageGroups || ['15+']),
+          ...(laborForce.ageGroups || ['15+'])
+        ]);
+        
+        const allYears = new Set([
+          ...(employment.years || []),
+          ...(unemployment.years || []),
+          ...(informal.years || []),
+          ...(laborForce.years || []),
+          ...(salary.years || [])
         ]);
         
         setAvailableCountries(Array.from(allCountries).sort());
+        setAvailableSexOptions(Array.from(allSexOptions).filter(Boolean));
+        setAvailableAgeGroups(Array.from(allAgeGroups).filter(Boolean));
+        setAvailableYears(Array.from(allYears).filter(Boolean).sort((a, b) => a - b));
+        
+        // Establecer rango de años inicial
+        const yearArray = Array.from(allYears).filter(Boolean).sort((a, b) => a - b);
+        if (yearArray.length > 0) {
+          setSelectedYearRange([yearArray[Math.max(0, yearArray.length - 10)], yearArray[yearArray.length - 1]]);
+        }
+        
         console.log('Datos cargados:', {
           employment: employment.data.length,
           unemployment: unemployment.data.length,
           informal: informal.data.length,
           laborForce: laborForce.data.length,
           salary: salary.data.length,
-          countries: Array.from(allCountries)
+          countries: Array.from(allCountries),
+          sexOptions: Array.from(allSexOptions),
+          ageGroups: Array.from(allAgeGroups),
+          years: Array.from(allYears)
         });
         
       } catch (err) {
@@ -181,25 +289,47 @@ const Dashboard = () => {
     loadAllData();
   }, []);
 
-  // Función para obtener datos del dataset activo
-  const getActiveData = () => {
+  // Función para obtener datos del dataset activo con filtros
+  const getFilteredActiveData = () => {
+    let data = [];
     switch (activeDataset) {
-      case 'employment': return employmentData;
-      case 'unemployment': return unemploymentData;
-      case 'informal': return informalEmploymentData;
-      case 'laborForce': return laborForceData;
-      case 'salary': return salaryData;
-      default: return [];
+      case 'employment': data = employmentData; break;
+      case 'unemployment': data = unemploymentData; break;
+      case 'informal': data = informalEmploymentData; break;
+      case 'laborForce': data = laborForceData; break;
+      case 'salary': data = salaryData; break;
+      default: data = [];
     }
+
+    return data.filter(row => {
+      const matchesSex = selectedSex === 'Total' || row.sex === selectedSex;
+      const matchesYear = row.year >= selectedYearRange[0] && row.year <= selectedYearRange[1];
+      const matchesCountry = selectedCountries.some(country => row.country.includes(country));
+      
+      // Para datasets con grupos de edad
+      let matchesAge = true;
+      if (activeDataset !== 'salary' && row.ageGroup) {
+        if (selectedAgeGroup === '15+') {
+          matchesAge = row.ageGroup.includes('15+');
+        } else if (selectedAgeGroup === '15-64') {
+          matchesAge = row.ageGroup.includes('15-64');
+        } else if (selectedAgeGroup === '15-24') {
+          matchesAge = row.ageGroup.includes('15-24');
+        } else if (selectedAgeGroup === '25+') {
+          matchesAge = row.ageGroup.includes('25+');
+        }
+      }
+      
+      return matchesSex && matchesYear && matchesCountry && matchesAge;
+    });
   };
 
-  // Procesar datos para el gráfico
+  // Procesar datos para el gráfico de series temporales
   const chartData = useMemo(() => {
-    const activeData = getActiveData();
+    const activeData = getFilteredActiveData();
     if (activeData.length === 0 || selectedCountries.length === 0) return [];
 
     const dataByYear = activeData
-      .filter(row => selectedCountries.some(country => row.country.includes(country)))
       .reduce((acc, row) => {
         const simplifiedCountry = selectedCountries.find(country => row.country.includes(country)) || row.country;
         acc[row.year] = { ...acc[row.year], year: row.year, [simplifiedCountry]: row.value };
@@ -207,17 +337,91 @@ const Dashboard = () => {
       }, {});
 
     return Object.values(dataByYear).sort((a, b) => a.year - b.year);
-  }, [selectedCountries, activeDataset, employmentData, unemploymentData, informalEmploymentData, laborForceData, salaryData]);
+  }, [selectedCountries, activeDataset, selectedSex, selectedAgeGroup, selectedYearRange, employmentData, unemploymentData, informalEmploymentData, laborForceData, salaryData]);
 
-  // Estadísticas resumidas
+  // Datos para análisis de correlación (scatter plot)
+  const scatterData = useMemo(() => {
+    if (selectedCountries.length === 0) return [];
+    
+    const getLatestData = (dataset, dataType) => {
+      return dataset
+        .filter(row => {
+          const matchesSex = selectedSex === 'Total' || row.sex === selectedSex;
+          const matchesCountry = selectedCountries.some(country => row.country.includes(country));
+          let matchesAge = true;
+          if (dataType !== 'salary' && row.ageGroup) {
+            matchesAge = row.ageGroup.includes(selectedAgeGroup);
+          }
+          return matchesSex && matchesCountry && matchesAge;
+        })
+        .sort((a, b) => b.year - a.year);
+    };
+
+    const latestEmployment = getLatestData(employmentData, 'employment');
+    const latestUnemployment = getLatestData(unemploymentData, 'unemployment');
+    
+    const scatterPoints = [];
+    selectedCountries.forEach(country => {
+      const empData = latestEmployment.find(row => row.country.includes(country));
+      const unempData = latestUnemployment.find(row => row.country.includes(country));
+      
+      if (empData && unempData) {
+        scatterPoints.push({
+          country: country,
+          employment: empData.value,
+          unemployment: unempData.value,
+          year: Math.max(empData.year, unempData.year)
+        });
+      }
+    });
+    
+    return scatterPoints;
+  }, [selectedCountries, selectedSex, selectedAgeGroup, employmentData, unemploymentData]);
+
+  // Datos para gráfico radar (comparación multidimensional)
+  const radarData = useMemo(() => {
+    if (selectedCountries.length === 0) return [];
+    
+    const getLatestValue = (dataset, country, dataType) => {
+      const countryData = dataset.filter(row => {
+        const matchesSex = selectedSex === 'Total' || row.sex === selectedSex;
+        const matchesCountry = row.country.includes(country);
+        let matchesAge = true;
+        if (dataType !== 'salary' && row.ageGroup) {
+          matchesAge = row.ageGroup.includes(selectedAgeGroup);
+        }
+        return matchesSex && matchesCountry && matchesAge;
+      }).sort((a, b) => b.year - a.year);
+      
+      return countryData.length > 0 ? countryData[0].value : 0;
+    };
+
+    return selectedCountries.slice(0, 3).map(country => ({
+      country: country,
+      employment: getLatestValue(employmentData, country, 'employment'),
+      unemployment: getLatestValue(unemploymentData, country, 'unemployment'),
+      informal: getLatestValue(informalEmploymentData, country, 'informal'),
+      laborForce: getLatestValue(laborForceData, country, 'laborForce'),
+      salary: getLatestValue(salaryData, country, 'salary') / 100 // Escalar para visualización
+    }));
+  }, [selectedCountries, selectedSex, selectedAgeGroup, employmentData, unemploymentData, informalEmploymentData, laborForceData, salaryData]);
+
+  // Estadísticas resumidas actualizadas
   const summaryStats = useMemo(() => {
     if (chartData.length === 0 || selectedCountries.length === 0) {
-      return { latestAvg: 'N/A', yearRange: 'N/A', totalCountries: 0 };
+      return { 
+        latestAvg: 'N/A', 
+        yearRange: 'N/A', 
+        totalCountries: 0,
+        dataPoints: 0,
+        trend: 'N/A'
+      };
     }
     
     let totalSum = 0;
     let totalCount = 0;
     const latestYearData = chartData[chartData.length - 1] || {};
+    const previousYearData = chartData[chartData.length - 2] || {};
 
     selectedCountries.forEach(country => {
       if (latestYearData[country] !== undefined) {
@@ -226,10 +430,32 @@ const Dashboard = () => {
       }
     });
 
+    // Calcular tendencia
+    let trend = 'N/A';
+    if (totalCount > 0 && Object.keys(previousYearData).length > 0) {
+      let prevSum = 0;
+      let prevCount = 0;
+      selectedCountries.forEach(country => {
+        if (previousYearData[country] !== undefined) {
+          prevSum += previousYearData[country];
+          prevCount++;
+        }
+      });
+      
+      if (prevCount > 0) {
+        const currentAvg = totalSum / totalCount;
+        const prevAvg = prevSum / prevCount;
+        const change = ((currentAvg - prevAvg) / prevAvg) * 100;
+        trend = change > 0 ? `+${change.toFixed(1)}%` : `${change.toFixed(1)}%`;
+      }
+    }
+
     return {
       latestAvg: totalCount > 0 ? `${(totalSum / totalCount).toFixed(2)}${datasets[activeDataset].unit}` : 'N/A',
       yearRange: chartData.length > 0 ? `${chartData[0].year} - ${chartData[chartData.length - 1].year}` : 'N/A',
-      totalCountries: selectedCountries.length
+      totalCountries: selectedCountries.length,
+      dataPoints: chartData.length * selectedCountries.length,
+      trend: trend
     };
   }, [chartData, selectedCountries, activeDataset]);
 
@@ -383,6 +609,110 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Filtros Avanzados */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <h2 className="text-lg font-semibold text-gray-700 flex items-center mb-6">
+            <HiOutlineSparkles className="mr-2" />
+            Filtros Avanzados
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Filtro por Sexo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <HiOutlineUserGroup className="mr-2" />
+                Sexo
+              </label>
+              <select
+                value={selectedSex}
+                onChange={(e) => setSelectedSex(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {availableSexOptions.map(sex => (
+                  <option key={sex} value={sex}>{sex}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filtro por Grupo de Edad */}
+            {activeDataset !== 'salary' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <HiOutlineAcademicCap className="mr-2" />
+                  Grupo de Edad
+                </label>
+                <select
+                  value={selectedAgeGroup}
+                  onChange={(e) => setSelectedAgeGroup(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {availableAgeGroups.map(age => (
+                    <option key={age} value={age}>
+                      {age.replace('Age (Youth, adults): ', '')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Filtro por Rango de Años */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <HiOutlineClock className="mr-2" />
+                Rango de Años
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={selectedYearRange[0]}
+                  onChange={(e) => setSelectedYearRange([parseInt(e.target.value), selectedYearRange[1]])}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {availableYears.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+                <span className="self-center text-gray-500">-</span>
+                <select
+                  value={selectedYearRange[1]}
+                  onChange={(e) => setSelectedYearRange([selectedYearRange[0], parseInt(e.target.value)])}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {availableYears.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Selector de Gráficos */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <HiOutlineCollection className="mr-2" />
+                Gráficos a Mostrar
+              </label>
+              <div className="space-y-2">
+                {Object.entries({
+                  timeSeries: 'Series Temporales',
+                  comparison: 'Comparación',
+                  distribution: 'Distribución',
+                  scatter: 'Correlación',
+                  radar: 'Radar'
+                }).map(([key, label]) => (
+                  <label key={key} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={activeCharts[key]}
+                      onChange={(e) => setActiveCharts(prev => ({ ...prev, [key]: e.target.checked }))}
+                      className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Filtros de países */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h2 className="text-lg font-semibold text-gray-700 flex items-center mb-4">
@@ -430,8 +760,8 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Estadísticas Resumen */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Estadísticas Resumen Expandidas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <StatCard 
             title="Países Seleccionados" 
             value={summaryStats.totalCountries} 
@@ -445,10 +775,22 @@ const Dashboard = () => {
             color="green" 
           />
           <StatCard 
+            title="Tendencia Anual" 
+            value={summaryStats.trend} 
+            icon={HiOutlineChartBar} 
+            color="purple" 
+          />
+          <StatCard 
+            title="Puntos de Datos" 
+            value={summaryStats.dataPoints} 
+            icon={HiOutlineCollection} 
+            color="orange" 
+          />
+          <StatCard 
             title="Rango de Años" 
             value={summaryStats.yearRange} 
             icon={HiOutlineCalendar} 
-            color="purple" 
+            color="indigo" 
           />
         </div>
 
@@ -510,6 +852,234 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Gráfico 1: Área Apilada - Tendencias Temporales */}
+        {activeCharts.timeSeries && selectedCountries.length > 0 && chartData.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              📈 Análisis de Tendencias - {datasets[activeDataset].title}
+            </h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <AreaChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis 
+                  label={{ 
+                    value: `${datasets[activeDataset].title} (${datasets[activeDataset].unit})`, 
+                    angle: -90, 
+                    position: 'insideLeft' 
+                  }} 
+                />
+                <Tooltip
+                  formatter={(value) => `${parseFloat(value).toFixed(2)}${datasets[activeDataset].unit}`}
+                />
+                <Legend />
+                {selectedCountries.map((country, index) => (
+                  <Area
+                    key={country}
+                    type="monotone"
+                    dataKey={country}
+                    stackId="1"
+                    stroke={COLORS[index % COLORS.length]}
+                    fill={COLORS[index % COLORS.length]}
+                    fillOpacity={0.6}
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Gráfico 2: Scatter Plot - Correlación Empleo vs Desempleo */}
+        {activeCharts.scatter && scatterData.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              🔍 Análisis de Correlación: Empleo vs Desempleo
+            </h2>
+            <div className="mb-4 text-sm text-gray-600">
+              <p>Cada punto representa un país. Filtros aplicados: {selectedSex}, {selectedAgeGroup}</p>
+            </div>
+            <ResponsiveContainer width="100%" height={400}>
+              <ScatterChart data={scatterData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <CartesianGrid />
+                <XAxis 
+                  type="number" 
+                  dataKey="employment" 
+                  name="Empleo" 
+                  unit="%" 
+                  label={{ value: 'Tasa de Empleo (%)', position: 'insideBottom', offset: -10 }}
+                />
+                <YAxis 
+                  type="number" 
+                  dataKey="unemployment" 
+                  name="Desempleo" 
+                  unit="%" 
+                  label={{ value: 'Tasa de Desempleo (%)', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip 
+                  cursor={{ strokeDasharray: '3 3' }}
+                  formatter={(value, name) => [`${value.toFixed(2)}%`, name === 'employment' ? 'Empleo' : 'Desempleo']}
+                  labelFormatter={(label, payload) => payload[0]?.payload?.country || ''}
+                />
+                <Scatter name="Países" dataKey="unemployment" fill="#8884d8">
+                  {scatterData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Gráfico 3: Radar Chart - Comparación Multidimensional */}
+        {activeCharts.radar && radarData.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              🎯 Análisis Multidimensional (Primeros 3 Países)
+            </h2>
+            <div className="mb-4 text-sm text-gray-600">
+              <p>Comparación de todos los indicadores. Salarios escalados ÷100</p>
+            </div>
+            <ResponsiveContainer width="100%" height={400}>
+              <RadarChart data={radarData[0] ? Object.keys(radarData[0]).filter(k => k !== 'country').map(key => ({
+                indicator: key,
+                ...radarData.reduce((acc, country, idx) => ({
+                  ...acc,
+                  [country.country]: country[key] || 0
+                }), {})
+              })) : []}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="indicator" />
+                <PolarRadiusAxis />
+                {radarData.map((country, index) => (
+                  <Radar
+                    key={country.country}
+                    name={country.country}
+                    dataKey={country.country}
+                    stroke={COLORS[index % COLORS.length]}
+                    fill={COLORS[index % COLORS.length]}
+                    fillOpacity={0.3}
+                  />
+                ))}
+                <Legend />
+                <Tooltip />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Gráfico 4: Gráfico Combinado - Análisis Temporal Avanzado */}
+        {activeCharts.comparison && selectedCountries.length > 0 && chartData.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              📊 Análisis Combinado - {datasets[activeDataset].title}
+            </h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <ComposedChart data={chartData} margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis 
+                  label={{ 
+                    value: `${datasets[activeDataset].title} (${datasets[activeDataset].unit})`, 
+                    angle: -90, 
+                    position: 'insideLeft' 
+                  }} 
+                />
+                <Tooltip formatter={(value) => `${parseFloat(value).toFixed(2)}${datasets[activeDataset].unit}`} />
+                <Legend />
+                {selectedCountries.slice(0, 2).map((country, index) => (
+                  <Line
+                    key={`line-${country}`}
+                    type="monotone"
+                    dataKey={country}
+                    stroke={COLORS[index % COLORS.length]}
+                    strokeWidth={3}
+                  />
+                ))}
+                {selectedCountries.slice(2, 4).map((country, index) => (
+                  <Bar
+                    key={`bar-${country}`}
+                    dataKey={country}
+                    fill={COLORS[(index + 2) % COLORS.length]}
+                    fillOpacity={0.7}
+                  />
+                ))}
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Gráfico 5: Distribución por Períodos */}
+        {activeCharts.distribution && selectedCountries.length > 0 && chartData.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              📈 Distribución por Períodos - {datasets[activeDataset].title}
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Gráfico de barras por país */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-700 mb-4">Por País (Promedio del Período)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart 
+                    data={selectedCountries.map(country => {
+                      const countryData = chartData.filter(d => d[country] !== undefined);
+                      const avg = countryData.length > 0 
+                        ? countryData.reduce((sum, d) => sum + (d[country] || 0), 0) / countryData.length 
+                        : 0;
+                      return { country, average: avg };
+                    })}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="country" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis />
+                    <Tooltip formatter={(value) => `${value.toFixed(2)}${datasets[activeDataset].unit}`} />
+                    <Bar dataKey="average" fill="#8884d8" radius={[4, 4, 0, 0]}>
+                      {selectedCountries.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Gráfico circular del último año */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-700 mb-4">Distribución (Último Año)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={chartData[chartData.length - 1] ? 
+                        selectedCountries.map((country, index) => ({
+                          name: country,
+                          value: chartData[chartData.length - 1][country] || 0,
+                          fill: COLORS[index % COLORS.length]
+                        })).filter(item => item.value > 0) : []
+                      }
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {selectedCountries.map((country, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `${value.toFixed(2)}${datasets[activeDataset].unit}`} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Gráfico de Barras Comparativo - Solo datos más recientes */}
         {selectedCountries.length > 0 && comparisonData.length > 0 && (
