@@ -24,7 +24,7 @@ export const useDatosGraficosEspecializados = ({
           const matchesCountry = selectedCountries.some(country => row.country.includes(country));
           let matchesAge = true;
           if (dataType !== 'salary' && row.ageGroup) {
-            matchesAge = row.ageGroup.includes(selectedAgeGroup);
+            matchesAge = selectedAgeGroup === '15+' || row.ageGroup.includes(selectedAgeGroup);
           }
           return matchesSex && matchesCountry && matchesAge;
         })
@@ -62,7 +62,7 @@ export const useDatosGraficosEspecializados = ({
         const matchesCountry = row.country.includes(country);
         let matchesAge = true;
         if (dataType !== 'salary' && row.ageGroup) {
-          matchesAge = row.ageGroup.includes(selectedAgeGroup);
+          matchesAge = selectedAgeGroup === '15+' || row.ageGroup.includes(selectedAgeGroup);
         }
         return matchesSex && matchesCountry && matchesAge;
       }).sort((a, b) => b.year - a.year);
@@ -75,13 +75,40 @@ export const useDatosGraficosEspecializados = ({
       employment: getLatestValue(employmentData, country, 'employment'),
       unemployment: getLatestValue(unemploymentData, country, 'unemployment'),
       informal: getLatestValue(informalEmploymentData, country, 'informal'),
-      laborForce: getLatestValue(laborForceData, country, 'laborForce'),
-      salary: getLatestValue(salaryData, country, 'salary') / 100 // Escalar para visualización
+      laborForce: getLatestValue(laborForceData || [], country, 'laborForce'),
+      salary: getLatestValue(salaryData || [], country, 'salary') / 100 // Escalar para visualización
     }));
   }, [selectedCountries, selectedSex, selectedAgeGroup, employmentData, unemploymentData, informalEmploymentData, laborForceData, salaryData]);
 
+  // Datos para mapa coroplético de empleo informal
+  const informalEmploymentMapData = useMemo(() => {
+    if (!informalEmploymentData || informalEmploymentData.length === 0) {
+      console.log('No hay datos de empleo informal disponibles');
+      return [];
+    }
+    
+    // Filtrar solo datos con sexo "Total"
+    const totalData = informalEmploymentData.filter(row => row.sex === 'Total');
+    
+    console.log('Datos de empleo informal filtrados (Total):', totalData.length);
+    console.log('Muestra de datos:', totalData.slice(0, 5));
+    
+    // Agrupar por país y año
+    const dataByCountryYear = totalData.reduce((acc, row) => {
+      const key = `${row.country}-${row.year}`;
+      acc[key] = row;
+      return acc;
+    }, {});
+    
+    const result = Object.values(dataByCountryYear);
+    console.log('Datos procesados para mapa coroplético:', result.length);
+    
+    return result;
+  }, [informalEmploymentData]);
+
   return {
     scatterData,
-    radarData
+    radarData,
+    informalEmploymentMapData
   };
 };

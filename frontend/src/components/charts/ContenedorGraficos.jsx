@@ -3,6 +3,7 @@ import TrendAreaChart from '../charts/AreaChart';
 import DistributionCharts from '../charts/DistributionCharts';
 import CombinedAnalysisChart from '../charts/ComposedChart';
 import FinalPieChart from '../charts/PieChart';
+import MapaCoropleticoEmpleoInformal from './MapaCoropleticoEmpleoInformal';
 
 const ContenedorGraficos = ({
   activeCharts,
@@ -11,10 +12,22 @@ const ContenedorGraficos = ({
   datasetsWithIcons,
   activeDataset,
   selectedSex,
-  selectedAgeGroup
+  selectedAgeGroup,
+  informalEmploymentMapData,
+  loading,
+  error
 }) => {
   return (
     <>
+      {/* Mapa Coroplético de Empleo Informal */}
+      {activeCharts.informalMap && (
+        <MapaCoropleticoEmpleoInformal 
+          data={informalEmploymentMapData}
+          loading={loading}
+          error={error}
+        />
+      )}
+
       {/* Gráfico de Área de Tendencia */}
       {activeCharts.timeSeries && (
         <TrendAreaChart 

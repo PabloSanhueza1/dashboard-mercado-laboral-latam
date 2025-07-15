@@ -105,7 +105,8 @@ const FiltrosAvanzados = ({
               comparison: 'Comparación',
               distribution: 'Distribución',
               scatter: 'Correlación',
-              radar: 'Radar'
+              radar: 'Radar',
+              informalMap: 'Mapa de Empleo Informal'
             }).map(([key, label]) => (
               <label key={key} className="flex items-center">
                 <input

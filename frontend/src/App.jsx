@@ -5,6 +5,7 @@ import { HiOutlineBriefcase } from 'react-icons/hi';
 import { useDataLoader } from './hooks/useDataLoader';
 import { useProcesadorDatos } from './hooks/useProcesadorDatos';
 import { useEstadisticasResumen } from './hooks/useEstadisticasResumen';
+import { useDatosGraficosEspecializados } from './hooks/useDatosGraficosEspecializados';
 
 // Import components
 import { PantallaCarga, PantallaError } from './components/ui/EstadosPantalla';
@@ -16,9 +17,11 @@ import GraficoPrincipal from './components/charts/GraficoPrincipal';
 import ContenedorGraficos from './components/charts/ContenedorGraficos';
 
 const Dashboard = () => {
-  // Use custom hook for data loading (only employment data)
+  // Use custom hook for data loading (including informal employment data)
   const {
     employmentData,
+    unemploymentData,
+    informalEmploymentData,
     availableCountries,
     availableYears,
     availableSexOptions,
@@ -37,7 +40,8 @@ const Dashboard = () => {
   const [activeCharts, setActiveCharts] = useState({
     timeSeries: true,
     comparison: true,
-    distribution: true
+    distribution: true,
+    informalMap: true
   });
 
   // Single dataset configuration for employment data
@@ -59,8 +63,20 @@ const Dashboard = () => {
     selectedCountries,
     selectedAgeGroup,
     employmentData,
-    unemploymentData: [],
-    informalEmploymentData: [],
+    unemploymentData,
+    informalEmploymentData,
+    laborForceData: [],
+    salaryData: []
+  });
+
+  // Get specialized chart data including informal employment map
+  const { informalEmploymentMapData } = useDatosGraficosEspecializados({
+    selectedCountries,
+    selectedSex,
+    selectedAgeGroup,
+    employmentData,
+    unemploymentData,
+    informalEmploymentData,
     laborForceData: [],
     salaryData: []
   });
@@ -145,8 +161,9 @@ const Dashboard = () => {
           activeDataset="employment"
           selectedSex={selectedSex}
           selectedAgeGroup={selectedAgeGroup}
-          scatterData={[]}
-          radarData={[]}
+          informalEmploymentMapData={informalEmploymentMapData}
+          loading={loading}
+          error={error}
         />
       </div>
     </div>

@@ -3,6 +3,8 @@ import Papa from 'papaparse';
 
 export const useDataLoader = () => {
   const [employmentData, setEmploymentData] = useState([]);
+  const [unemploymentData, setUnemploymentData] = useState([]);
+  const [informalEmploymentData, setInformalEmploymentData] = useState([]);
   const [availableCountries, setAvailableCountries] = useState([]);
   const [availableYears, setAvailableYears] = useState([]);
   const [availableSexOptions, setAvailableSexOptions] = useState([]);
@@ -10,21 +12,21 @@ export const useDataLoader = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Single dataset configuration
+  // Updated datasets configuration
   const datasets = {
-    employment: {
-      title: 'Tasa de Empleo',
+    informalEmployment: {
+      title: 'Tasa de Empleo Informal',
       unit: '%',
-      color: '#3B82F6',
-      filename: 'tasa de empleo.csv'
+      color: '#F59E0B',
+      filename: 'tasa_empleo_informal_por_sexo_sudamerica.csv'
     }
   };
 
-  const loadEmploymentData = async () => {
+  const loadInformalEmploymentData = async () => {
     try {
-      const response = await fetch('/data/tasa de empleo.csv');
+      const response = await fetch('/dataset/tasa_empleo_informal_por_sexo_sudamerica.csv');
       if (!response.ok) {
-        throw new Error(`Error al cargar tasa de empleo.csv: ${response.status}`);
+        throw new Error(`Error al cargar tasa_empleo_informal_por_sexo_sudamerica.csv: ${response.status}`);
       }
       
       const csvText = await response.text();
@@ -37,17 +39,16 @@ export const useDataLoader = () => {
           transform: (value) => value.trim(),
           complete: (results) => {
             if (results.errors.length > 0) {
-              console.warn('Errores en el parsing de tasa de empleo:', results.errors);
+              console.warn('Errores en el parsing de empleo informal:', results.errors);
             }
             
             const processedData = results.data
-              .filter(row => row.Country && row.Year && row.Value)
+              .filter(row => row['ref_area.label'] && row.time && row.obs_value)
               .map(row => ({
-                country: row.Country,
-                year: parseInt(row.Year),
-                sex: row.Sex || 'Total',
-                ageGroup: row['Age group'] || '15+',
-                value: parseFloat(row.Value)
+                country: row['ref_area.label'],
+                year: parseInt(row.time),
+                sex: row['sex.label'] || 'Total',
+                value: parseFloat(row.obs_value)
               }))
               .filter(row => !isNaN(row.year) && !isNaN(row.value));
             
@@ -57,15 +58,16 @@ export const useDataLoader = () => {
         });
       });
     } catch (error) {
-      throw new Error(`Error al procesar tasa de empleo.csv: ${error.message}`);
+      throw new Error(`Error al procesar tasa_empleo_informal_por_sexo_sudamerica.csv: ${error.message}`);
     }
   };
 
-  const extractUniqueValues = (data) => {
-    const countries = [...new Set(data.map(row => row.country))].sort();
-    const years = [...new Set(data.map(row => row.year))].sort((a, b) => a - b);
-    const sexOptions = [...new Set(data.map(row => row.sex))].sort();
-    const ageGroups = [...new Set(data.map(row => row.ageGroup))].sort();
+  const extractUniqueValues = (employmentData, unemploymentData, informalData) => {
+    const allData = [...employmentData, ...unemploymentData, ...informalData];
+    const countries = [...new Set(allData.map(row => row.country))].sort();
+    const years = [...new Set(allData.map(row => row.year))].sort((a, b) => a - b);
+    const sexOptions = [...new Set(allData.map(row => row.sex))].sort();
+    const ageGroups = [...new Set(allData.map(row => row.ageGroup).filter(Boolean))].sort();
 
     return { countries, years, sexOptions, ageGroups };
   };
@@ -76,14 +78,18 @@ export const useDataLoader = () => {
         setLoading(true);
         setError(null);
         
-        console.log('Cargando datos de empleo...');
-        const employmentData = await loadEmploymentData();
+        console.log('Cargando datos...');
+        const [informalData] = await Promise.all([
+          loadInformalEmploymentData()
+        ]);
         
-        console.log(`Datos de empleo cargados: ${employmentData.length} registros`);
+        console.log(`Datos cargados: informal=${informalData.length}`);
         
-        const { countries, years, sexOptions, ageGroups } = extractUniqueValues(employmentData);
+        const { countries, years, sexOptions, ageGroups } = extractUniqueValues(employmentData, unemploymentData, informalData);
         
         setEmploymentData(employmentData);
+        setUnemploymentData(unemploymentData);
+        setInformalEmploymentData(informalData);
         setAvailableCountries(countries);
         setAvailableYears(years);
         setAvailableSexOptions(sexOptions);
@@ -104,6 +110,8 @@ export const useDataLoader = () => {
 
   return {
     employmentData,
+    unemploymentData,
+    informalEmploymentData,
     availableCountries,
     availableYears,
     availableSexOptions,
