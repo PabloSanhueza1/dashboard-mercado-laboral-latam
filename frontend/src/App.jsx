@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiOutlineBriefcase } from 'react-icons/hi';
+import { HiOutlineBriefcase, HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineTrendingUp, HiOutlineCollection } from 'react-icons/hi';
 
 // Import custom hooks
 import { useDataLoader } from './hooks/useDataLoader';
@@ -10,7 +10,6 @@ import { useDatosGraficosEspecializados } from './hooks/useDatosGraficosEspecial
 // Import components
 import { PantallaCarga, PantallaError } from './components/ui/EstadosPantalla';
 import EncabezadoDashboard from './components/layout/EncabezadoDashboard';
-import FiltrosAvanzados from './components/filtros/FiltrosAvanzados';
 import FiltrosPaises from './components/filtros/FiltrosPaises';
 import ResumenEstadisticas from './components/estadisticas/ResumenEstadisticas';
 import GraficoPrincipal from './components/charts/GraficoPrincipal';
@@ -31,18 +30,18 @@ const Dashboard = () => {
     datasets
   } = useDataLoader();
 
-  // Local state
+  // Local state - valores por defecto sin filtros avanzados
   const [selectedCountries, setSelectedCountries] = useState(['Chile', 'Argentina', 'Brazil', 'Colombia', 'Peru']);
-  const [selectedSex, setSelectedSex] = useState('Total');
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState('15+');
-  const [selectedYearRange, setSelectedYearRange] = useState([2015, 2024]);
+  const selectedSex = 'Total';
+  const selectedAgeGroup = '15+';
+  const selectedYearRange = [2015, 2024];
   
-  const [activeCharts, setActiveCharts] = useState({
+  const activeCharts = {
     timeSeries: true,
     comparison: true,
     distribution: true,
     informalMap: true
-  });
+  };
 
   // Single dataset configuration for employment data
   const datasetsWithIcons = {
@@ -105,66 +104,113 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Encabezado */}
-        <EncabezadoDashboard />
+    <div className="dashboard-container">
+      <div className="dashboard-content fade-in">
+        {/* Header Section */}
+        <div className="dashboard-header">
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-white bg-opacity-20 rounded-16 backdrop-blur">
+                <HiOutlineGlobeAlt className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-800 text-white">
+                  Dashboard Mercado Laboral
+                </h1>
+                <p className="text-blue-100 text-lg mt-2">
+                  Análisis Integral de Empleo en Sudamérica
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6 mt-6 text-blue-100">
+              <div className="flex items-center gap-2">
+                <HiOutlineChartBar className="w-5 h-5" />
+                <span className="text-sm">Datos actualizados 2024</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <HiOutlineBriefcase className="w-5 h-5" />
+                <span className="text-sm">{availableCountries.length} países</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        {/* Filtros Avanzados */}
-        <FiltrosAvanzados 
-          selectedSex={selectedSex}
-          setSelectedSex={setSelectedSex}
-          selectedAgeGroup={selectedAgeGroup}
-          setSelectedAgeGroup={setSelectedAgeGroup}
-          selectedYearRange={selectedYearRange}
-          setSelectedYearRange={setSelectedYearRange}
-          activeCharts={activeCharts}
-          setActiveCharts={setActiveCharts}
-          availableSexOptions={availableSexOptions}
-          availableAgeGroups={availableAgeGroups}
-          availableYears={availableYears}
-          activeDataset="employment"
-        />
+        {/* Main Content */}
+        <div className="dashboard-main">
+          {/* Country Selection */}
+          <div className="section-spacing-large">
+            <div className="glass-card p-8 slide-up">
+              <FiltrosPaises 
+                availableCountries={availableCountries}
+                selectedCountries={selectedCountries}
+                setSelectedCountries={setSelectedCountries}
+                handleCountryToggle={handleCountryToggle}
+              />
+            </div>
+          </div>
 
-        {/* Filtros de Países */}
-        <FiltrosPaises 
-          availableCountries={availableCountries}
-          selectedCountries={selectedCountries}
-          setSelectedCountries={setSelectedCountries}
-          handleCountryToggle={handleCountryToggle}
-        />
+          <div className="section-divider"></div>
 
-        {/* Resumen de Estadísticas */}
-        <ResumenEstadisticas 
-          selectedCountries={selectedCountries}
-          datasetsWithIcons={datasetsWithIcons}
-          activeDataset="employment"
-          chartData={chartData}
-          selectedYearRange={selectedYearRange}
-          summaryStats={summaryStats}
-        />
+          {/* Statistics Overview */}
+          <div className="section-spacing-large slide-up">
+            <div className="filter-header">
+              <h2 className="filter-title">
+                <HiOutlineTrendingUp className="text-green-600" />
+                Resumen Estadístico
+              </h2>
+              <p className="filter-subtitle">
+                Métricas clave del análisis actual
+              </p>
+            </div>
+            <ResumenEstadisticas 
+              selectedCountries={selectedCountries}
+              datasetsWithIcons={datasetsWithIcons}
+              activeDataset="employment"
+              chartData={chartData}
+              selectedYearRange={selectedYearRange}
+              summaryStats={summaryStats}
+            />
+          </div>
 
-        {/* Gráfico Principal */}
-        <GraficoPrincipal 
-          chartData={chartData}
-          selectedCountries={selectedCountries}
-          datasetsWithIcons={datasetsWithIcons}
-          activeDataset="employment"
-        />
+          <div className="section-divider"></div>
 
-        {/* Contenedor de Gráficos */}
-        <ContenedorGraficos 
-          activeCharts={activeCharts}
-          chartData={chartData}
-          selectedCountries={selectedCountries}
-          datasetsWithIcons={datasetsWithIcons}
-          activeDataset="employment"
-          selectedSex={selectedSex}
-          selectedAgeGroup={selectedAgeGroup}
-          informalEmploymentMapData={informalEmploymentMapData}
-          loading={loading}
-          error={error}
-        />
+          {/* Main Chart */}
+          <div className="section-spacing-large slide-up">
+            <GraficoPrincipal 
+              chartData={chartData}
+              selectedCountries={selectedCountries}
+              datasetsWithIcons={datasetsWithIcons}
+              activeDataset="employment"
+            />
+          </div>
+
+          <div className="section-divider"></div>
+
+          {/* Additional Charts */}
+          <div className="section-spacing slide-up">
+            <div className="filter-header">
+              <h2 className="filter-title">
+                <HiOutlineCollection className="text-purple-600" />
+                Análisis Detallado
+              </h2>
+              <p className="filter-subtitle">
+                Visualizaciones complementarias y análisis especializado
+              </p>
+            </div>
+            <ContenedorGraficos 
+              activeCharts={activeCharts}
+              chartData={chartData}
+              selectedCountries={selectedCountries}
+              datasetsWithIcons={datasetsWithIcons}
+              activeDataset="employment"
+              selectedSex={selectedSex}
+              selectedAgeGroup={selectedAgeGroup}
+              informalEmploymentMapData={informalEmploymentMapData}
+              loading={loading}
+              error={error}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
