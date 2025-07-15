@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Plot from 'react-plotly.js';
 // Importar StatCard reutilizable
 import { StatCard } from '../estadisticas/ResumenEstadisticas';
-import { HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineGlobe, HiOutlineCollection } from 'react-icons/hi';
+import { HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineGlobe, HiOutlineCollection, HiOutlineCalendar } from 'react-icons/hi';
 
 /**
  * Componente para visualizar un mapa coroplético de tasa de empleo informal por país en Sudamérica
@@ -320,7 +320,13 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
 
       {/* Estadísticas contextuales con StatCard */}
       {stats && (
-        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="stats-grid grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <StatCard
+            title="Países Analizados"
+            value={stats.paises}
+            icon={HiOutlineGlobe}
+            color="blue"
+          />
           <StatCard
             title="Promedio Regional"
             value={`${stats.promedio}%`}
@@ -340,10 +346,10 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
             color="orange"
           />
           <StatCard
-            title="Países"
-            value={stats.paises}
-            icon={HiOutlineGlobe}
-            color="blue"
+            title="Año Actual"
+            value={selectedYear}
+            icon={HiOutlineCalendar}
+            color="indigo"
           />
         </div>
       )}
