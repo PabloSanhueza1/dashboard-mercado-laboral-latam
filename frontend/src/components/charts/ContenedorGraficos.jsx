@@ -1,10 +1,7 @@
 import React from 'react';
 import TrendAreaChart from '../charts/AreaChart';
-import CorrelationScatterChart from '../charts/ScatterChart';
-import MultiDimensionalRadarChart from '../charts/RadarChart';
-import CombinedAnalysisChart from '../charts/ComposedChart';
 import DistributionCharts from '../charts/DistributionCharts';
-import MultiIndicatorChart from '../charts/ComparisonChart';
+import CombinedAnalysisChart from '../charts/ComposedChart';
 import FinalPieChart from '../charts/PieChart';
 
 const ContenedorGraficos = ({
@@ -14,9 +11,7 @@ const ContenedorGraficos = ({
   datasetsWithIcons,
   activeDataset,
   selectedSex,
-  selectedAgeGroup,
-  scatterData,
-  radarData
+  selectedAgeGroup
 }) => {
   return (
     <>
@@ -27,22 +22,6 @@ const ContenedorGraficos = ({
           selectedCountries={selectedCountries}
           datasets={datasetsWithIcons}
           activeDataset={activeDataset}
-        />
-      )}
-
-      {/* Gráfico de Dispersión de Correlación */}
-      {activeCharts.scatter && (
-        <CorrelationScatterChart 
-          scatterData={scatterData}
-          selectedSex={selectedSex}
-          selectedAgeGroup={selectedAgeGroup}
-        />
-      )}
-
-      {/* Gráfico Radar Multidimensional */}
-      {activeCharts.radar && (
-        <MultiDimensionalRadarChart 
-          radarData={radarData}
         />
       )}
 
@@ -65,12 +44,6 @@ const ContenedorGraficos = ({
           activeDataset={activeDataset}
         />
       )}
-
-      {/* Gráfico de Múltiples Indicadores */}
-      <MultiIndicatorChart 
-        comparisonData={[]} // Necesitarás computar esto
-        datasets={datasetsWithIcons}
-      />
 
       {/* Gráfico de Pastel Final */}
       <FinalPieChart 

@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  HiOutlineBriefcase, HiOutlineChartBar, HiOutlineUsers, 
-  HiOutlineGlobe, HiOutlineCurrencyDollar
-} from 'react-icons/hi';
+import { HiOutlineBriefcase } from 'react-icons/hi';
 
 // Import custom hooks
 import { useDataLoader } from './hooks/useDataLoader';
 import { useProcesadorDatos } from './hooks/useProcesadorDatos';
-import { useDatosGraficosEspecializados } from './hooks/useDatosGraficosEspecializados';
 import { useEstadisticasResumen } from './hooks/useEstadisticasResumen';
 
 // Import components
 import { PantallaCarga, PantallaError } from './components/ui/EstadosPantalla';
 import EncabezadoDashboard from './components/layout/EncabezadoDashboard';
-import SelectorDataset from './components/filtros/SelectorDataset';
 import FiltrosAvanzados from './components/filtros/FiltrosAvanzados';
 import FiltrosPaises from './components/filtros/FiltrosPaises';
 import ResumenEstadisticas from './components/estadisticas/ResumenEstadisticas';
@@ -21,13 +16,9 @@ import GraficoPrincipal from './components/charts/GraficoPrincipal';
 import ContenedorGraficos from './components/charts/ContenedorGraficos';
 
 const Dashboard = () => {
-  // Use custom hook for data loading
+  // Use custom hook for data loading (only employment data)
   const {
     employmentData,
-    unemploymentData,
-    informalEmploymentData,
-    laborForceData,
-    salaryData,
     availableCountries,
     availableYears,
     availableSexOptions,
@@ -39,7 +30,6 @@ const Dashboard = () => {
 
   // Local state
   const [selectedCountries, setSelectedCountries] = useState(['Chile', 'Argentina', 'Brazil', 'Colombia', 'Peru']);
-  const [activeDataset, setActiveDataset] = useState('employment');
   const [selectedSex, setSelectedSex] = useState('Total');
   const [selectedAgeGroup, setSelectedAgeGroup] = useState('15+');
   const [selectedYearRange, setSelectedYearRange] = useState([2015, 2024]);
@@ -47,51 +37,39 @@ const Dashboard = () => {
   const [activeCharts, setActiveCharts] = useState({
     timeSeries: true,
     comparison: true,
-    distribution: true,
-    scatter: true,
-    radar: true
+    distribution: true
   });
 
-  // Add icons to datasets
+  // Single dataset configuration for employment data
   const datasetsWithIcons = {
-    ...datasets,
-    employment: { ...datasets.employment, icon: HiOutlineBriefcase },
-    unemployment: { ...datasets.unemployment, icon: HiOutlineChartBar },
-    informal: { ...datasets.informal, icon: HiOutlineUsers },
-    laborForce: { ...datasets.laborForce, icon: HiOutlineGlobe },
-    salary: { ...datasets.salary, icon: HiOutlineCurrencyDollar }
+    employment: { 
+      ...datasets.employment, 
+      icon: HiOutlineBriefcase,
+      title: 'Tasa de Empleo',
+      unit: '%',
+      color: '#3B82F6'
+    }
   };
 
   // Use custom hooks for data processing
   const { chartData } = useProcesadorDatos({
-    activeDataset,
+    activeDataset: 'employment',
     selectedSex,
     selectedYearRange,
     selectedCountries,
     selectedAgeGroup,
     employmentData,
-    unemploymentData,
-    informalEmploymentData,
-    laborForceData,
-    salaryData
-  });
-
-  const { scatterData, radarData } = useDatosGraficosEspecializados({
-    selectedCountries,
-    selectedSex,
-    selectedAgeGroup,
-    employmentData,
-    unemploymentData,
-    informalEmploymentData,
-    laborForceData,
-    salaryData
+    unemploymentData: [],
+    informalEmploymentData: [],
+    laborForceData: [],
+    salaryData: []
   });
 
   const summaryStats = useEstadisticasResumen({
     chartData,
     selectedCountries,
-    datasets,
-    activeDataset
+    datasets: datasetsWithIcons,
+    activeDataset: 'employment'
   });
 
   const handleCountryToggle = (country) => {
@@ -116,13 +94,6 @@ const Dashboard = () => {
         {/* Encabezado */}
         <EncabezadoDashboard />
 
-        {/* Selector de Dataset */}
-        <SelectorDataset 
-          datasetsWithIcons={datasetsWithIcons}
-          activeDataset={activeDataset}
-          setActiveDataset={setActiveDataset}
-        />
-
         {/* Filtros Avanzados */}
         <FiltrosAvanzados 
           selectedSex={selectedSex}
@@ -136,7 +107,7 @@ const Dashboard = () => {
           availableSexOptions={availableSexOptions}
           availableAgeGroups={availableAgeGroups}
           availableYears={availableYears}
-          activeDataset={activeDataset}
+          activeDataset="employment"
         />
 
         {/* Filtros de Países */}
@@ -151,7 +122,7 @@ const Dashboard = () => {
         <ResumenEstadisticas 
           selectedCountries={selectedCountries}
           datasetsWithIcons={datasetsWithIcons}
-          activeDataset={activeDataset}
+          activeDataset="employment"
           chartData={chartData}
           selectedYearRange={selectedYearRange}
           summaryStats={summaryStats}
@@ -162,7 +133,7 @@ const Dashboard = () => {
           chartData={chartData}
           selectedCountries={selectedCountries}
           datasetsWithIcons={datasetsWithIcons}
-          activeDataset={activeDataset}
+          activeDataset="employment"
         />
 
         {/* Contenedor de Gráficos */}
@@ -171,11 +142,11 @@ const Dashboard = () => {
           chartData={chartData}
           selectedCountries={selectedCountries}
           datasetsWithIcons={datasetsWithIcons}
-          activeDataset={activeDataset}
+          activeDataset="employment"
           selectedSex={selectedSex}
           selectedAgeGroup={selectedAgeGroup}
-          scatterData={scatterData}
-          radarData={radarData}
+          scatterData={[]}
+          radarData={[]}
         />
       </div>
     </div>
