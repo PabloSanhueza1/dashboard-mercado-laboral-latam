@@ -1,5 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Plot from 'react-plotly.js';
+// Importar StatCard reutilizable
+import { StatCard } from '../estadisticas/ResumenEstadisticas';
+import { HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineGlobe, HiOutlineCollection } from 'react-icons/hi';
 
 /**
  * Componente para visualizar un mapa coroplético de tasa de empleo informal por país en Sudamérica
@@ -42,7 +45,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
   // Obtener años disponibles
   const availableYears = useMemo(() => {
     if (!data || data.length === 0) return [];
-    const years = [...new Set(data.map(row => row.year))].sort((a, b) => b - a);
+    const years = [...new Set(data.map(row => row.year))].sort((a, b) => a - b);
     return years;
   }, [data]);
 
@@ -53,92 +56,101 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
     }
   }, [availableYears, selectedYear]);
 
-  // Procesar datos para el año seleccionado con mejor información
-  const mapData = useMemo(() => {
-    if (!data || data.length === 0) return { locations: [], z: [], text: [], customdata: [] };
+  // Procesar datos para todos los años disponibles
+  const allMapData = useMemo(() => {
+    if (!data || data.length === 0 || availableYears.length === 0) return [];
 
-    const yearData = data.filter(row => row.year === selectedYear);
-    
-    const locations = [];
-    const values = [];
-    const hoverText = [];
-    const customData = [];
+    return availableYears.map(year => {
+      const yearData = data.filter(row => row.year === year);
 
-    yearData.forEach(row => {
-      const countryCode = countryMapping[row.country];
-      const displayName = countryDisplayNames[row.country] || row.country;
-      
-      if (countryCode) {
-        locations.push(countryCode);
-        values.push(row.value);
-        
-        // Categorizar el nivel de informalidad
-        let categoria = '';
-        let emoji = '';
-        if (row.value >= 70) {
-          categoria = 'Muy Alta';
-          emoji = '🔴';
-        } else if (row.value >= 50) {
-          categoria = 'Alta';
-          emoji = '🟠';
-        } else if (row.value >= 30) {
-          categoria = 'Moderada';
-          emoji = '🟡';
-        } else {
-          categoria = 'Baja';
-          emoji = '🟢';
+      const locations = [];
+      const values = [];
+      const hoverText = [];
+      const customData = [];
+
+      yearData.forEach(row => {
+        const countryCode = countryMapping[row.country];
+        const displayName = countryDisplayNames[row.country] || row.country;
+
+        if (countryCode) {
+          locations.push(countryCode);
+          values.push(row.value);
+
+          // Categorizar el nivel de informalidad
+          let categoria = '';
+          let emoji = '';
+          if (row.value >= 70) {
+            categoria = 'Muy Alta';
+            emoji = '🔴';
+          } else if (row.value >= 50) {
+            categoria = 'Alta';
+            emoji = '🟠';
+          } else if (row.value >= 30) {
+            categoria = 'Moderada';
+            emoji = '🟡';
+          } else {
+            categoria = 'Baja';
+            emoji = '🟢';
+          }
+
+          hoverText.push(
+            `<b>${displayName}</b><br>` +
+            `Año: ${row.year}<br>` +
+            `Tasa de empleo informal: <b>${row.value.toFixed(1)}%</b><br>` +
+            `Nivel: ${emoji} ${categoria}<br>` +
+            `<i>Usa el deslizador para cambiar de año</i>`
+          );
+
+          customData.push({
+            country: displayName,
+            value: row.value,
+            year: row.year,
+            categoria: categoria
+          });
         }
-        
-        hoverText.push(
-          `<b>${displayName}</b><br>` +
-          `Año: ${row.year}<br>` +
-          `Tasa de empleo informal: <b>${row.value.toFixed(1)}%</b><br>` +
-          `Nivel: ${emoji} ${categoria}<br>` +
-          `<i>Haz clic para más detalles</i>`
-        );
-        
-        customData.push({
-          country: displayName,
-          value: row.value,
-          year: row.year,
-          categoria: categoria
-        });
-      }
-    });
+      });
 
-    return {
-      locations,
-      z: values,
-      text: hoverText,
-      customdata: customData
-    };
-  }, [data, selectedYear]);
+      return {
+        year,
+        locations,
+        z: values,
+        text: hoverText,
+        customdata: customData
+      };
+    });
+  }, [data, availableYears]);
+
+  // Datos del año actual seleccionado
+  const currentYearData = useMemo(() => {
+    return allMapData.find(item => item.year === selectedYear) ||
+      { locations: [], z: [], text: [], customdata: [] };
+  }, [allMapData, selectedYear]);
 
   // Calcular estadísticas para el contexto
   const stats = useMemo(() => {
-    if (mapData.z.length === 0) return null;
-    
-    const values = mapData.z;
+    if (currentYearData.z.length === 0) return null;
+
+    const values = currentYearData.z;
     const promedio = values.reduce((sum, val) => sum + val, 0) / values.length;
     const maximo = Math.max(...values);
     const minimo = Math.min(...values);
-    
+
     return {
       promedio: promedio.toFixed(1),
       maximo: maximo.toFixed(1),
       minimo: minimo.toFixed(1),
       paises: values.length
     };
-  }, [mapData]);
+  }, [currentYearData]);
 
-  // Configuración mejorada del gráfico
+  // Configuración mejorada del gráfico con slider
   const plotData = [{
     type: 'choropleth',
     locationmode: 'ISO-3',
-    locations: mapData.locations,
-    z: mapData.z,
-    text: mapData.text,
-    customdata: mapData.customdata,
+    locations: currentYearData.locations,
+    z: currentYearData.z,
+    text: currentYearData.text,
+    customdata: currentYearData.customdata,
     hovertemplate: '%{text}<extra></extra>',
     colorscale: [
       [0, '#065f46'],      // Verde muy oscuro (0-20%)
@@ -177,7 +189,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
     },
     geo: {
       scope: 'south america',
-      projection: { 
+      projection: {
         type: 'mercator',
         scale: 1.2
       },
@@ -196,11 +208,47 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       countrywidth: 1.5,
       bgcolor: '#f1f5f9'
     },
-    margin: { t: 80, b: 60, l: 60, r: 120 },
-    height: 600,
+    margin: { t: 80, b: 120, l: 60, r: 120 },
+    height: 700,
     font: { family: 'Inter, Arial, sans-serif', size: 12 },
     paper_bgcolor: 'white',
-    plot_bgcolor: 'white'
+    plot_bgcolor: 'white',
+    sliders: [{
+      active: availableYears.indexOf(selectedYear),
+      currentvalue: {
+        visible: true,
+        prefix: "Año: ",
+        xanchor: "center",
+        font: { size: 16, color: "#1e293b" }
+      },
+      steps: availableYears.map((year, index) => ({
+        args: [
+          {
+            locations: [allMapData[index]?.locations || []],
+            z: [allMapData[index]?.z || []],
+            text: [allMapData[index]?.text || []],
+            customdata: [allMapData[index]?.customdata || []]
+          },
+          {
+            'title.text': `<b>Tasa de Empleo Informal por País - Sudamérica (${year})</b><br><span style="font-size: 12px; color: #666;">Porcentaje de trabajadores en empleos informales</span>`
+          }
+        ],
+        label: year.toString(),
+        method: "restyle",
+        value: year
+      })),
+      pad: { t: 50 },
+      len: 0.8,
+      x: 0.1,
+      xanchor: "left",
+      y: 0,
+      yanchor: "top",
+      font: { size: 12 },
+      ticklen: 0,
+      borderwidth: 1,
+      bordercolor: "#ccc",
+      bgcolor: "#f8f9fa"
+    }]
   };
 
   const config = {
@@ -255,7 +303,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
 
   return (
     <div className="chart-container">
-      {/* Header mejorado */}
+      {/* Header mejorado sin selector de año */}
       <div className="chart-header">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -263,52 +311,40 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
               🗺️ Mapa de Empleo Informal en Sudamérica
             </h3>
             <p className="text-sm text-gray-600 mt-1">
-              Visualización interactiva de la tasa de empleo informal por país
+              Visualización interactiva de la tasa de empleo informal por país.
+              <strong> Usa el deslizador en la parte inferior del mapa para cambiar el año.</strong>
             </p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label htmlFor="year-selector" className="text-sm font-medium text-gray-700">
-                📅 Año:
-              </label>
-              <select
-                id="year-selector"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="form-select min-w-[100px]"
-              >
-                {availableYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Estadísticas contextuales */}
+      {/* Estadísticas contextuales con StatCard */}
       {stats && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-          <h4 className="font-semibold text-gray-800 mb-3">📈 Estadísticas del {selectedYear}</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center">
-              <div className="font-bold text-lg text-blue-600">{stats.promedio}%</div>
-              <div className="text-gray-600">Promedio Regional</div>
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-lg text-red-600">{stats.maximo}%</div>
-              <div className="text-gray-600">Máximo</div>
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-lg text-green-600">{stats.minimo}%</div>
-              <div className="text-gray-600">Mínimo</div>
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-lg text-purple-600">{stats.paises}</div>
-              <div className="text-gray-600">Países</div>
-            </div>
-          </div>
+        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard
+            title="Promedio Regional"
+            value={`${stats.promedio}%`}
+            icon={HiOutlineTrendingUp}
+            color="green"
+          />
+          <StatCard
+            title="Máximo"
+            value={`${stats.maximo}%`}
+            icon={HiOutlineChartBar}
+            color="purple"
+          />
+          <StatCard
+            title="Mínimo"
+            value={`${stats.minimo}%`}
+            icon={HiOutlineCollection}
+            color="orange"
+          />
+          <StatCard
+            title="Países"
+            value={stats.paises}
+            icon={HiOutlineGlobe}
+            color="blue"
+          />
         </div>
       )}
 
@@ -335,14 +371,43 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
         </div>
       </div>
 
-      {/* Mapa */}
+      {/* Mapa con slider */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <Plot
           data={plotData}
           layout={layout}
           config={config}
-          style={{ width: '100%', height: '600px' }}
+          style={{ width: '100%', height: '700px' }}
           useResizeHandler={true}
+          onUpdate={(figure, graphDiv) => {
+            // Detectar cambios en el slider y actualizar el estado
+            if (figure.layout && figure.layout.sliders && figure.layout.sliders[0]) {
+              const activeStep = figure.layout.sliders[0].active;
+              if (activeStep !== undefined && availableYears[activeStep]) {
+                const newYear = availableYears[activeStep];
+                if (newYear !== selectedYear) {
+                  setSelectedYear(newYear);
+                }
+              }
+            }
+          }}
+          onSliderChange={(data) => {
+            if (data && data.slider && data.slider.value) {
+              setSelectedYear(parseInt(data.slider.value));
+            }
+          }}
+          onPlotlyRestyle={(data, graphDiv) => {
+            // Manejar cambios cuando se usa el slider
+            if (graphDiv && graphDiv.layout && graphDiv.layout.sliders && graphDiv.layout.sliders[0]) {
+              const activeStep = graphDiv.layout.sliders[0].active;
+              if (activeStep !== undefined && availableYears[activeStep]) {
+                const newYear = availableYears[activeStep];
+                if (newYear !== selectedYear) {
+                  setSelectedYear(newYear);
+                }
+              }
+            }
+          }}
         />
       </div>
 
@@ -353,12 +418,13 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
           <div className="grid md:grid-cols-2 gap-2">
             <div>• <strong>Colores más oscuros:</strong> Mayor tasa de empleo informal</div>
             <div>• <strong>Colores más claros:</strong> Menor tasa de empleo informal</div>
+            <div>• <strong>Deslizador temporal:</strong> Cambia el año visualizado</div>
             <div>• <strong>Datos:</strong> Solo población total, sin distinción de sexo</div>
             <div>• <strong>Fuente:</strong> ILO-STATISTICS - Procesamiento de microdatos</div>
           </div>
           <div className="mt-3 p-2 bg-white rounded border border-blue-300">
-            <strong>💡 Tip:</strong> Pasa el cursor sobre cada país para ver información detallada. 
-            El empleo informal incluye trabajadores sin protección social formal.
+            <strong>💡 Tip:</strong> Usa el deslizador temporal en la parte inferior del mapa para explorar
+            la evolución del empleo informal a través de los años. Pasa el cursor sobre cada país para ver información detallada.
           </div>
         </div>
       </div>

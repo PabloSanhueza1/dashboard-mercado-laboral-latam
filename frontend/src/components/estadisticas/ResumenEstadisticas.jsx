@@ -4,7 +4,8 @@ import {
   HiOutlineCollection, HiOutlineCalendar 
 } from 'react-icons/hi';
 
-const StatCard = ({ title, value, icon: Icon, color = 'blue', trend }) => {
+// StatCard reutilizable
+export const StatCard = ({ title, value, icon: Icon, color = 'blue', trend }) => {
   const colorClasses = {
     blue: 'from-blue-500 to-blue-600 bg-blue-50 text-blue-600 border-blue-200',
     green: 'from-green-500 to-green-600 bg-green-50 text-green-600 border-green-200',
@@ -14,25 +15,23 @@ const StatCard = ({ title, value, icon: Icon, color = 'blue', trend }) => {
   };
 
   return (
-    <div className="stat-card group">
+    <div className="stat-card group relative bg-white bg-opacity-80 rounded-xl border p-5 shadow hover:shadow-lg transition-all duration-200">
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-xl ${colorClasses[color].split(' ').slice(2).join(' ')} border transition-all duration-300 group-hover:scale-110`}>
           <Icon className="w-6 h-6" />
         </div>
-        {trend && (
+        {trend !== undefined && trend !== null && (
           <div className={`text-xs font-semibold px-2 py-1 rounded-full ${
-            trend > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+            parseFloat(trend) > 0 ? 'bg-green-100 text-green-600' : parseFloat(trend) < 0 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
           }`}>
-            {trend > 0 ? '+' : ''}{trend}%
+            {parseFloat(trend) > 0 ? '+' : ''}{trend}%
           </div>
         )}
       </div>
-      
       <div>
-        <div className="stat-value text-gradient">{value}</div>
-        <div className="stat-label">{title}</div>
+        <div className="stat-value text-2xl font-bold text-gray-800">{value}</div>
+        <div className="stat-label text-gray-500">{title}</div>
       </div>
-      
       <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${colorClasses[color].split(' ').slice(0, 2).join(' ')} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
     </div>
   );
@@ -47,27 +46,26 @@ const ResumenEstadisticas = ({
   summaryStats
 }) => {
   return (
-    <div className="stats-grid">
+    <div className="stats-grid grid grid-cols-2 md:grid-cols-5 gap-4">
       <StatCard 
         title="Países Seleccionados" 
         value={selectedCountries.length} 
         icon={HiOutlineGlobe} 
         color="blue"
-        trend={2.1}
       />
       <StatCard 
         title={`Promedio ${datasetsWithIcons[activeDataset].title}`} 
         value={summaryStats.latestAvg} 
         icon={HiOutlineTrendingUp} 
         color="green"
-        trend={1.8}
+        trend={summaryStats.trend !== 'N/A' ? parseFloat(summaryStats.trend) : undefined}
       />
       <StatCard 
         title="Tendencia Anual" 
         value={summaryStats.trend} 
         icon={HiOutlineChartBar} 
         color="purple"
-        trend={-0.5}
+        trend={summaryStats.trend !== 'N/A' ? parseFloat(summaryStats.trend) : undefined}
       />
       <StatCard 
         title="Puntos de Datos" 
