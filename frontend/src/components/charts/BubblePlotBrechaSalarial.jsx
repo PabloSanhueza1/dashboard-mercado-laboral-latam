@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
+import { HiOutlineGlobe, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineCollection, HiOutlineCalendar } from 'react-icons/hi';
+
+import { StatCard } from '../estadisticas/ResumenEstadisticas';
 
 const BubblePlotBrechaSalarial = () => {
     const [data, setData] = useState([]);
@@ -173,6 +176,19 @@ const BubblePlotBrechaSalarial = () => {
         return null;
     };
 
+    // Estadísticas para el año seleccionado
+    const stats = useMemo(() => {
+        if (currentYearData.length === 0) return null;
+        const brechas = currentYearData.map(item => parseFloat(item.gapPercentage));
+        return {
+            paises: currentYearData.length,
+            max: Math.max(...brechas).toFixed(1),
+            min: Math.min(...brechas).toFixed(1),
+            promedio: (brechas.reduce((sum, v) => sum + v, 0) / brechas.length).toFixed(1),
+            year: selectedYear
+        };
+    }, [currentYearData, selectedYear]);
+
     if (loading) {
         return (
             <div className="chart-container">
@@ -202,6 +218,7 @@ const BubblePlotBrechaSalarial = () => {
 
     return (
         <div className="chart-container bg-white p-6 rounded-lg shadow-sm">
+            {/* Header */}
             <div className="mb-6">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">
                     Brecha Salarial de Género por País - {selectedYear}
@@ -209,34 +226,130 @@ const BubblePlotBrechaSalarial = () => {
                 <p className="text-gray-600 text-sm mb-4">
                     Salarios promedio mensuales en USD. La línea diagonal representa equidad salarial perfecta.
                 </p>
-
-                {/* Year Slider */}
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Año: {selectedYear}
-                    </label>
+                {/* Slider tipo barra */}
+                <div className="flex items-center gap-4 mb-4">
+                    <span className="text-xs text-gray-500">Año:</span>
                     <input
                         type="range"
                         min={Math.min(...availableYears)}
                         max={Math.max(...availableYears)}
+                        step={1}
                         value={selectedYear}
-                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        onChange={e => setSelectedYear(Number(e.target.value))}
+                        className="w-48 md:w-64 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600
+                          focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
                         style={{
-                            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((selectedYear - Math.min(...availableYears)) /
-                                (Math.max(...availableYears) - Math.min(...availableYears))) * 100
-                                }%, #e5e7eb ${((selectedYear - Math.min(...availableYears)) /
-                                    (Math.max(...availableYears) - Math.min(...availableYears))) * 100
-                                }%, #e5e7eb 100%)`
+                            // Hide default thumb for all browsers
+                            WebkitAppearance: 'none',
+                            appearance: 'none',
                         }}
+                        list="years-list"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>{Math.min(...availableYears)}</span>
-                        <span>{Math.max(...availableYears)}</span>
-                    </div>
+                    <datalist id="years-list">
+                        {availableYears.map(year => (
+                            <option key={year} value={year} label={year.toString()} />
+                        ))}
+                    </datalist>
+                    <span className="text-sm font-semibold text-blue-700 ml-2">{selectedYear}</span>
                 </div>
+                {/* Custom slider styles */}
+                <style>
+                    {`
+                  input[type="range"].accent-blue-600::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 9999px;
+                    background: #2563eb;
+                    border: 3px solid #fff;
+                    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                    transition: background 0.2s;
+                  }
+                  input[type="range"].accent-blue-600:focus::-webkit-slider-thumb {
+                    outline: 2px solid #2563eb;
+                  }
+                  input[type="range"].accent-blue-600::-moz-range-thumb {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 9999px;
+                    background: #2563eb;
+                    border: 3px solid #fff;
+                    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                    transition: background 0.2s;
+                  }
+                  input[type="range"].accent-blue-600::-ms-thumb {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 9999px;
+                    background: #2563eb;
+                    border: 3px solid #fff;
+                    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                    transition: background 0.2s;
+                  }
+                  input[type="range"].accent-blue-600::-webkit-slider-thumb:hover {
+                    background: #1d4ed8;
+                  }
+                  input[type="range"].accent-blue-600::-webkit-slider-runnable-track {
+                    height: 8px;
+                    border-radius: 4px;
+                    background: #e5e7eb;
+                  }
+                  input[type="range"].accent-blue-600::-ms-fill-lower {
+                    background: #e5e7eb;
+                  }
+                  input[type="range"].accent-blue-600::-ms-fill-upper {
+                    background: #e5e7eb;
+                  }
+                  input[type="range"].accent-blue-600:focus::-webkit-slider-thumb {
+                    box-shadow: 0 0 0 4px #93c5fd;
+                  }
+                  input[type="range"].accent-blue-600:focus::-ms-thumb {
+                    box-shadow: 0 0 0 4px #93c5fd;
+                  }
+                  input[type="range"].accent-blue-600:focus {
+                    outline: none;
+                  }
+                  `}
+                </style>
+                {/* Estadísticas en tarjetas estilo StatCard */}
+                {stats && (
+                    <div className="stats-grid grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                        <StatCard
+                            title="Países estudiados"
+                            value={stats.paises}
+                            icon={HiOutlineGlobe}
+                            color="blue"
+                        />
+                        <StatCard
+                            title="Brecha más alta"
+                            value={`${stats.max}%`}
+                            icon={HiOutlineTrendingUp}
+                            color="purple"
+                        />
+                        <StatCard
+                            title="Brecha más baja"
+                            value={`${stats.min}%`}
+                            icon={HiOutlineCollection}
+                            color="orange"
+                        />
+                        <StatCard
+                            title="Brecha promedio"
+                            value={`${stats.promedio}%`}
+                            icon={HiOutlineChartBar}
+                            color="green"
+                        />
+                        <StatCard
+                            title="Año"
+                            value={stats.year}
+                            icon={HiOutlineCalendar}
+                            color="indigo"
+                        />
+                    </div>
+                )}
             </div>
 
+            {/* Bubble Chart */}
             <div style={{ width: '100%', height: '400px' }}>
                 <ResponsiveContainer>
                     <ScatterChart
@@ -307,28 +420,6 @@ const BubblePlotBrechaSalarial = () => {
                     <span className="text-sm text-gray-600">Equidad salarial perfecta</span>
                 </div>
             </div>
-
-            {/* Statistics */}
-            {currentYearData.length > 0 && (
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-blue-800">Países con datos</h4>
-                        <p className="text-2xl font-bold text-blue-600">{currentYearData.length}</p>
-                    </div>
-                    <div className="bg-red-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-red-800">Brecha promedio</h4>
-                        <p className="text-2xl font-bold text-red-600">
-                            {(currentYearData.reduce((sum, item) => sum + parseFloat(item.gapPercentage), 0) / currentYearData.length).toFixed(1)}%
-                        </p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-green-800">Menor brecha</h4>
-                        <p className="text-2xl font-bold text-green-600">
-                            {Math.min(...currentYearData.map(item => parseFloat(item.gapPercentage))).toFixed(1)}%
-                        </p>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
