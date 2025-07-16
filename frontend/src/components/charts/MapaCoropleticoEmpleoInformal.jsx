@@ -97,8 +97,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
             `<b>${displayName}</b><br>` +
             `Año: ${row.year}<br>` +
             `Tasa de empleo informal: <b>${row.value.toFixed(1)}%</b><br>` +
-            `Nivel: ${emoji} ${categoria}<br>` +
-            `<i>Usa el deslizador para cambiar de año</i>`
+            `Nivel: ${emoji} ${categoria}<br>`
           );
 
           customData.push({
@@ -181,8 +180,8 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
 
   const layout = {
     title: {
-      text: `<b>Tasa de Empleo Informal por País - Sudamérica (${selectedYear})</b><br><span style="font-size: 12px; color: #666;">Porcentaje de trabajadores en empleos informales</span>`,
-      font: { size: 18, family: 'Inter, Arial, sans-serif', color: '#1e293b' },
+      text: `<b>Tasa de Empleo Informal por País - Sudamérica (${selectedYear})</b><br><span style="font-size: 10px; color: #666;">Porcentaje de trabajadores en empleos informales</span>`,
+      font: { size: 14, family: 'Inter, Arial, sans-serif', color: '#1e293b' },
       x: 0.5,
       xanchor: 'center',
       y: 0.95
@@ -208,9 +207,9 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       countrywidth: 1.5,
       bgcolor: '#f1f5f9'
     },
-    margin: { t: 80, b: 120, l: 60, r: 120 },
-    height: 700,
-    font: { family: 'Inter, Arial, sans-serif', size: 12 },
+    margin: { t: 60, b: 80, l: 40, r: 80 },
+    height: 500,
+    font: { family: 'Inter, Arial, sans-serif', size: 10 },
     paper_bgcolor: 'white',
     plot_bgcolor: 'white',
     sliders: [{
@@ -219,7 +218,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
         visible: true,
         prefix: "Año: ",
         xanchor: "center",
-        font: { size: 16, color: "#1e293b" }
+        font: { size: 12, color: "#1e293b" }
       },
       steps: availableYears.map((year, index) => ({
         args: [
@@ -230,7 +229,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
             customdata: [allMapData[index]?.customdata || []]
           },
           {
-            'title.text': `<b>Tasa de Empleo Informal por País - Sudamérica (${year})</b><br><span style="font-size: 12px; color: #666;">Porcentaje de trabajadores en empleos informales</span>`
+            'title.text': `<b>Tasa de Empleo Informal por País - Sudamérica (${year})</b><br><span style="font-size: 10px; color: #666;">Porcentaje de trabajadores en empleos informales</span>`
           }
         ],
         label: year.toString(),
@@ -243,7 +242,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       xanchor: "left",
       y: 0,
       yanchor: "top",
-      font: { size: 12 },
+      font: { size: 10 },
       ticklen: 0,
       borderwidth: 1,
       bordercolor: "#ccc",
@@ -307,13 +306,9 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       <div className="chart-header">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="chart-title">
+            <h3 className="text-lg font-semibold text-gray-900">
               🗺️ Mapa de Empleo Informal en Sudamérica
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              Visualización interactiva de la tasa de empleo informal por país.
-              <strong> Usa el deslizador en la parte inferior del mapa para cambiar el año.</strong>
-            </p>
           </div>
         </div>
       </div>
@@ -346,7 +341,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
             color="orange"
           />
           <StatCard
-            title="Año Actual"
+            title="Año"
             value={selectedYear}
             icon={HiOutlineCalendar}
             color="indigo"
@@ -354,36 +349,13 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
         </div>
       )}
 
-      {/* Leyenda de interpretación */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-        <h4 className="font-semibold text-gray-800 mb-3">🎯 Guía de Interpretación</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-600 rounded"></div>
-            <span><strong>0-30%:</strong> Baja informalidad</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-            <span><strong>30-50%:</strong> Moderada</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-orange-500 rounded"></div>
-            <span><strong>50-70%:</strong> Alta</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-600 rounded"></div>
-            <span><strong>70%+:</strong> Muy alta</span>
-          </div>
-        </div>
-      </div>
-
       {/* Mapa con slider */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <Plot
           data={plotData}
           layout={layout}
           config={config}
-          style={{ width: '100%', height: '700px' }}
+          style={{ width: '100%', height: '500px' }}
           useResizeHandler={true}
           onUpdate={(figure, graphDiv) => {
             // Detectar cambios en el slider y actualizar el estado
@@ -419,22 +391,32 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
 
       {/* Información adicional mejorada */}
       <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-        <div className="text-sm text-blue-800 space-y-2">
-          <div className="font-semibold mb-2">ℹ️ Información del Mapa:</div>
-          <div className="grid md:grid-cols-2 gap-2">
-            <div>• <strong>Colores más oscuros:</strong> Mayor tasa de empleo informal</div>
-            <div>• <strong>Colores más claros:</strong> Menor tasa de empleo informal</div>
-            <div>• <strong>Deslizador temporal:</strong> Cambia el año visualizado</div>
-            <div>• <strong>Datos:</strong> Solo población total, sin distinción de sexo</div>
-            <div>• <strong>Fuente:</strong> ILO-STATISTICS - Procesamiento de microdatos</div>
+        <div className="text-xs text-blue-800 space-y-2">
+          {/* Guía de interpretación movida aquí */}
+          <div className="mt-4 p-3 bg-white rounded-lg border border-blue-300">
+            <h4 className="font-semibold text-blue-900 mb-3 text-sm">🎯 Guía de Interpretación</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-600 rounded"></div>
+                <span><strong>0-30%:</strong> Baja informalidad</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+                <span><strong>30-50%:</strong> Moderada</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                <span><strong>50-70%:</strong> Alta</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-600 rounded"></div>
+                <span><strong>70%+:</strong> Muy alta</span>
+              </div>
+            </div>
           </div>
-          <div className="mt-3 p-2 bg-white rounded border border-blue-300">
-            <strong>💡 Tip:</strong> Usa el deslizador temporal en la parte inferior del mapa para explorar
-            la evolución del empleo informal a través de los años. Pasa el cursor sobre cada país para ver información detallada.
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
