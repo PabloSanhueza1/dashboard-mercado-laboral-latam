@@ -21,18 +21,18 @@ const csvUrl = "/dataset/poblacion_economicamente_activa_por_sexo_edad_sudameric
 
 // Parsea el CSV usando los nombres correctos de columnas
 function parseCSV(text) {
-  const result = Papa.parse(text, { header: true, skipEmptyLines: true });
-  // Filtra y transforma igual que antes
-  return result.data
-    .filter(row => row["classif1.label"]?.startsWith("Age (10-year bands):"))
-    .map(row => ({
-      country: row["ref_area.label"],
-      sex: row["sex.label"],
-      ageGroup: row["classif1.label"].match(/(\d{2}-\d{2}|\d{2}\+)/)?.[0],
-      year: Number(row["time"]),
-      rate: Number(row["obs_value"]),
-    }))
-    .filter(d => ["Male", "Female"].includes(d.sex) && d.ageGroup);
+    const result = Papa.parse(text, { header: true, skipEmptyLines: true });
+    // Filtra y transforma igual que antes
+    return result.data
+        .filter(row => row["classif1.label"]?.startsWith("Age (10-year bands):"))
+        .map(row => ({
+            country: row["ref_area.label"],
+            sex: row["sex.label"],
+            ageGroup: row["classif1.label"].match(/(\d{2}-\d{2}|\d{2}\+)/)?.[0],
+            year: Number(row["time"]),
+            rate: Number(row["obs_value"]),
+        }))
+        .filter(d => ["Male", "Female"].includes(d.sex) && d.ageGroup);
 }
 
 // Mapeo mejorado de nombres de países del CSV a códigos ISO-3
@@ -106,7 +106,7 @@ const DotPlotParticipacionLaboral = () => {
     }, [data, selectedCountry, selectedYear]);
 
     // Obtiene años y países disponibles
-    const availableYears = useMemo(() => [...new Set(data.map(d => d.year))].sort((a, b) => b - a), [data]);
+    const availableYears = useMemo(() => [...new Set(data.map(d => d.year))].sort((a, b) => a - b), [data]);
     const availableCountries = useMemo(() => [...new Set(data.map(d => d.country))], [data]);
     console.log("availableCountries:", availableCountries);
     // Eje X: grupos de edad ordenados (de todos los años para el país seleccionado)
@@ -168,13 +168,33 @@ const DotPlotParticipacionLaboral = () => {
                                 <button
                                     key={c}
                                     type="button"
-                                    className={`px-3 py-1 rounded text-sm border transition
+                                    className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
                                         ${selectedCountry === c
-                                            ? "bg-blue-600 text-white border-blue-700 font-semibold"
-                                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-400"}`}
+                                            ? "bg-[#e5e5e5] border-[#888] text-black"
+                                            : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                                    style={{
+                                        backgroundColor: selectedCountry === c ? '#007bff' : '#fff', // azul si seleccionado, blanco si no
+                                        color: selectedCountry === c ? '#fff' : '#007bff',           // texto blanco si seleccionado, azul si no
+                                        border: '1px solid #007bff',                                 // borde azul en todos
+                                        padding: '10px 20px',
+                                        borderRadius: '8px',
+                                        fontWeight: 'normal',
+                                        fontSize: '16px',
+                                        boxShadow: 'none',
+                                        cursor: 'pointer',
+                                        minWidth: 90,
+                                        outline: 'none',
+                                        margin: '8px 8px 8px 0',
+                                    }}
                                     onClick={() => setSelectedCountry(c)}
                                 >
-                                    {countryDisplayNames[c] || c}
+                                    <span className="truncate">{countryDisplayNames[c] || c}</span>
+                                    {selectedCountry === c && (
+                                        <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
+                                            <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
+                                            <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    )}
                                 </button>
                             ))}
                         </div>
@@ -281,7 +301,7 @@ const DotPlotParticipacionLaboral = () => {
                     Año: <span className="font-semibold text-blue-700">{selectedYear}</span>
                 </label>
                 <div className="flex items-center w-96 max-w-full">
-                    <span className="text-xs text-gray-400 mr-2">{availableYears[availableYears.length - 1]}</span>
+                    <span className="text-xs text-gray-400 mr-2">{availableYears[0]}</span>
                     <input
                         type="range"
                         min={0}
@@ -297,7 +317,7 @@ const DotPlotParticipacionLaboral = () => {
                             boxShadow: "0 1px 4px rgba(37,99,235,0.10)",
                         }}
                     />
-                    <span className="text-xs text-gray-400 ml-2">{availableYears[0]}</span>
+                    <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
                 </div>
                 <style>{`
                     input[type="range"]::-webkit-slider-thumb {
