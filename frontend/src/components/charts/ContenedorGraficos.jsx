@@ -1,6 +1,7 @@
 import React from 'react';
 import MapaCoropleticoEmpleoInformal from './MapaCoropleticoEmpleoInformal';
 import GraficoBarrasSalarios from './GraficoBarrasSalarios';
+import BubblePlotBrechaSalarial from './BubblePlotBrechaSalarial';
 
 const ContenedorGraficos = ({
   informalEmploymentMapData,
@@ -18,6 +19,8 @@ const ContenedorGraficos = ({
 
       {/* Gráfico de Barras - Salario Mínimo vs Ingreso Promedio */}
       <GraficoBarrasSalarios />
+
+      <BubblePlotBrechaSalarial/>
     </div>
   );
 };
