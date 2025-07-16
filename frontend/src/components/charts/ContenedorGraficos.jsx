@@ -1,5 +1,6 @@
 import React from 'react';
 import MapaCoropleticoEmpleoInformal from './MapaCoropleticoEmpleoInformal';
+import GraficoBarrasSalarios from './GraficoBarrasSalarios';
 
 const ContenedorGraficos = ({
   informalEmploymentMapData,
@@ -15,6 +16,10 @@ const ContenedorGraficos = ({
         error={error}
       />
 
+      {/* Gráfico de Barras - Salario Mínimo vs Ingreso Promedio */}
+      <div className="mt-8">
+        <GraficoBarrasSalarios />
+      </div>
     </>
   );
 };
