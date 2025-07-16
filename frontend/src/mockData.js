@@ -79,12 +79,3 @@ export const mockEmploymentData = [
     ]
   }
 ];
-
-export const generateMockData = (selectedCountries) => {
-  return mockEmploymentData.filter(item => 
-    selectedCountries.length === 0 || 
-    selectedCountries.some(selected => 
-      item.country.toLowerCase().includes(selected.toLowerCase())
-    )
-  );
-};

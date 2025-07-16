@@ -302,13 +302,16 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
 
   return (
     <div className="chart-container">
-      {/* Header mejorado sin selector de año */}
+      {/* Header mejorado */}
       <div className="chart-header">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
               🗺️ Mapa de Empleo Informal en Sudamérica
             </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Visualización de las tasas de empleo informal por país
+            </p>
           </div>
         </div>
       </div>
@@ -392,7 +395,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       {/* Información adicional mejorada */}
       <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
         <div className="text-xs text-blue-800 space-y-2">
-          {/* Guía de interpretación movida aquí */}
+          {/* Guía de interpretación */}
           <div className="mt-4 p-3 bg-white rounded-lg border border-blue-300">
             <h4 className="font-semibold text-blue-900 mb-3 text-sm">🎯 Guía de Interpretación</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
@@ -414,9 +417,9 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
               </div>
             </div>
           </div>
-          </div>
         </div>
       </div>
+    </div>
   );
 };
 

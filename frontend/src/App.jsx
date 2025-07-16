@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { HiOutlineBriefcase, HiOutlineGlobeAlt, HiOutlineChartBar, HiOutlineTrendingUp, HiOutlineCollection } from 'react-icons/hi';
+import React from 'react';
+import { HiOutlineBriefcase, HiOutlineGlobeAlt, HiOutlineChartBar } from 'react-icons/hi';
 
 // Import custom hooks
 import { useDataLoader } from './hooks/useDataLoader';
-import { useProcesadorDatos } from './hooks/useProcesadorDatos';
 import { useDatosGraficosEspecializados } from './hooks/useDatosGraficosEspecializados';
 import { PantallaCarga, PantallaError } from './components/ui/EstadosPantalla';
 import ContenedorGraficos from './components/charts/ContenedorGraficos';
@@ -14,47 +13,25 @@ const Dashboard = () => {
     employmentData,
     unemploymentData,
     informalEmploymentData,
-    availableCountries,
-    availableYears,
-    availableSexOptions,
-    availableAgeGroups,
     loading,
     error,
     datasets
   } = useDataLoader();
 
-  // Local state - valores por defecto sin filtros avanzados
-  const [selectedCountries, setSelectedCountries] = useState(['Chile', 'Argentina', 'Brazil', 'Colombia', 'Peru']);
-  const selectedSex = 'Total';
-  const selectedAgeGroup = '15+';
-  const selectedYearRange = [2015, 2024];
-  
-
-  // Use custom hooks for data processing
-  const { chartData } = useProcesadorDatos({
-    activeDataset: 'employment',
-    selectedSex,
-    selectedYearRange,
-    selectedCountries,
-    selectedAgeGroup,
-    employmentData,
-    unemploymentData,
-    informalEmploymentData,
-    laborForceData: [],
-    salaryData: []
-  });
-
   // Get specialized chart data including informal employment map
   const { informalEmploymentMapData } = useDatosGraficosEspecializados({
-    selectedCountries,
-    selectedSex,
-    selectedAgeGroup,
     employmentData,
     unemploymentData,
     informalEmploymentData,
     laborForceData: [],
     salaryData: []
   });
+
+  // Obtener lista de países disponibles para mostrar información
+  const availableCountries = React.useMemo(() => {
+    if (!informalEmploymentData || informalEmploymentData.length === 0) return [];
+    return [...new Set(informalEmploymentData.map(row => row.country))].sort();
+  }, [informalEmploymentData]);
 
   if (loading) {
     return <PantallaCarga />;
@@ -98,7 +75,6 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="dashboard-main">
-
           <div className="section-divider"></div>
 
           {/* Additional Charts */}

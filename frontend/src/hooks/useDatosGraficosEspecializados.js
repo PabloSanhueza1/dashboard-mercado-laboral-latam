@@ -4,9 +4,6 @@ import { useMemo } from 'react';
  * Hook personalizado para generar datos específicos para gráficos especializados
  */
 export const useDatosGraficosEspecializados = ({
-  selectedCountries,
-  selectedSex,
-  selectedAgeGroup,
   employmentData,
   unemploymentData,
   informalEmploymentData,
@@ -15,29 +12,21 @@ export const useDatosGraficosEspecializados = ({
 }) => {
   // Datos para análisis de correlación (scatter plot)
   const scatterData = useMemo(() => {
-    if (selectedCountries.length === 0) return [];
-    
-    const getLatestData = (dataset, dataType) => {
+    const getLatestData = (dataset) => {
       return dataset
-        .filter(row => {
-          const matchesSex = selectedSex === 'Total' || row.sex === selectedSex;
-          const matchesCountry = selectedCountries.some(country => row.country.includes(country));
-          let matchesAge = true;
-          if (dataType !== 'salary' && row.ageGroup) {
-            matchesAge = selectedAgeGroup === '15+' || row.ageGroup.includes(selectedAgeGroup);
-          }
-          return matchesSex && matchesCountry && matchesAge;
-        })
+        .filter(row => row.sex === 'Total') // Solo datos totales
         .sort((a, b) => b.year - a.year);
     };
 
-    const latestEmployment = getLatestData(employmentData, 'employment');
-    const latestUnemployment = getLatestData(unemploymentData, 'unemployment');
+    const latestEmployment = getLatestData(employmentData);
+    const latestUnemployment = getLatestData(unemploymentData);
     
     const scatterPoints = [];
-    selectedCountries.forEach(country => {
-      const empData = latestEmployment.find(row => row.country.includes(country));
-      const unempData = latestUnemployment.find(row => row.country.includes(country));
+    const countries = [...new Set([...latestEmployment, ...latestUnemployment].map(row => row.country))];
+    
+    countries.forEach(country => {
+      const empData = latestEmployment.find(row => row.country === country);
+      const unempData = latestUnemployment.find(row => row.country === country);
       
       if (empData && unempData) {
         scatterPoints.push({
@@ -50,35 +39,29 @@ export const useDatosGraficosEspecializados = ({
     });
     
     return scatterPoints;
-  }, [selectedCountries, selectedSex, selectedAgeGroup, employmentData, unemploymentData]);
+  }, [employmentData, unemploymentData]);
 
   // Datos para gráfico radar (comparación multidimensional)
   const radarData = useMemo(() => {
-    if (selectedCountries.length === 0) return [];
-    
-    const getLatestValue = (dataset, country, dataType) => {
+    const getLatestValue = (dataset, country) => {
       const countryData = dataset.filter(row => {
-        const matchesSex = selectedSex === 'Total' || row.sex === selectedSex;
-        const matchesCountry = row.country.includes(country);
-        let matchesAge = true;
-        if (dataType !== 'salary' && row.ageGroup) {
-          matchesAge = selectedAgeGroup === '15+' || row.ageGroup.includes(selectedAgeGroup);
-        }
-        return matchesSex && matchesCountry && matchesAge;
+        return row.sex === 'Total' && row.country === country;
       }).sort((a, b) => b.year - a.year);
       
       return countryData.length > 0 ? countryData[0].value : 0;
     };
 
-    return selectedCountries.slice(0, 3).map(country => ({
+    const countries = [...new Set(employmentData.map(row => row.country))].slice(0, 3);
+    
+    return countries.map(country => ({
       country: country,
-      employment: getLatestValue(employmentData, country, 'employment'),
-      unemployment: getLatestValue(unemploymentData, country, 'unemployment'),
-      informal: getLatestValue(informalEmploymentData, country, 'informal'),
-      laborForce: getLatestValue(laborForceData || [], country, 'laborForce'),
-      salary: getLatestValue(salaryData || [], country, 'salary') / 100 // Escalar para visualización
+      employment: getLatestValue(employmentData, country),
+      unemployment: getLatestValue(unemploymentData, country),
+      informal: getLatestValue(informalEmploymentData, country),
+      laborForce: getLatestValue(laborForceData || [], country),
+      salary: getLatestValue(salaryData || [], country) / 100 // Escalar para visualización
     }));
-  }, [selectedCountries, selectedSex, selectedAgeGroup, employmentData, unemploymentData, informalEmploymentData, laborForceData, salaryData]);
+  }, [employmentData, unemploymentData, informalEmploymentData, laborForceData, salaryData]);
 
   // Datos para mapa coroplético de empleo informal
   const informalEmploymentMapData = useMemo(() => {
