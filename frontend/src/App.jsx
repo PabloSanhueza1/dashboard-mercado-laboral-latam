@@ -79,7 +79,7 @@ const Dashboard = () => {
 
           {/* Additional Charts */}
           <div className="section-spacing slide-up">
-            <ContenedorGraficos 
+            <ContenedorGraficos
               informalEmploymentMapData={informalEmploymentMapData}
               loading={loading}
               error={error}

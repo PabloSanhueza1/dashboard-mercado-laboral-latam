@@ -43,17 +43,22 @@ const GraficoBarrasSalarios = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-300 rounded shadow">
-          <p className="font-semibold">{label}</p>
-          <p className="text-blue-600">
-            Salario Mínimo: ${payload[0]?.value?.toLocaleString()} USD
-          </p>
-          <p className="text-green-600">
-            Ingreso Promedio: ${payload[1]?.value?.toLocaleString()} USD
-          </p>
+        <div style={{
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          padding: '10px',
+          borderRadius: '5px'
+        }}>
+          <p><strong>{label}</strong></p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color }}>
+              {entry.name}: ${entry.value} USD
+            </p>
+          ))}
         </div>
       );
     }
+
     return null;
   };
 
