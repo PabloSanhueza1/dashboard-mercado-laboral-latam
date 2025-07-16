@@ -30,6 +30,20 @@ const Dashboard = () => {
   const selectedYearRange = [2015, 2024];
   
 
+  // Use custom hooks for data processing
+  const { chartData } = useProcesadorDatos({
+    activeDataset: 'employment',
+    selectedSex,
+    selectedYearRange,
+    selectedCountries,
+    selectedAgeGroup,
+    employmentData,
+    unemploymentData,
+    informalEmploymentData,
+    laborForceData: [],
+    salaryData: []
+  });
+
   // Get specialized chart data including informal employment map
   const { informalEmploymentMapData } = useDatosGraficosEspecializados({
     selectedCountries,
