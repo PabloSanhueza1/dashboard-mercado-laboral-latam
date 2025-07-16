@@ -8,7 +8,7 @@ const ContenedorGraficos = ({
   error
 }) => {
   return (
-    <>
+    <div className="space-y-8">
       {/* Mapa Coroplético de Empleo Informal */}
       <MapaCoropleticoEmpleoInformal 
         data={informalEmploymentMapData}
@@ -17,10 +17,8 @@ const ContenedorGraficos = ({
       />
 
       {/* Gráfico de Barras - Salario Mínimo vs Ingreso Promedio */}
-      <div className="mt-8">
-        <GraficoBarrasSalarios />
-      </div>
-    </>
+      <GraficoBarrasSalarios />
+    </div>
   );
 };
 

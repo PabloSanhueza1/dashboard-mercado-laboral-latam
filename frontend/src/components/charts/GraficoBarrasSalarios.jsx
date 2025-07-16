@@ -64,63 +64,89 @@ const GraficoBarrasSalarios = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <div className="text-lg">Cargando datos de salarios...</div>
+      <div className="chart-container">
+        <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando datos de salarios...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <div className="text-red-500 text-lg">{error}</div>
+      <div className="chart-container">
+        <div className="flex items-center justify-center h-96 bg-red-50 rounded-lg">
+          <div className="text-center">
+            <div className="text-red-500 text-xl mb-2">⚠️</div>
+            <p className="text-red-700">Error al cargar los datos de salarios</p>
+            <p className="text-sm text-red-600 mt-1">{error}</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-white p-6 rounded-lg shadow-lg">
-      <h3 className="text-xl font-bold text-center mb-6">
-        Salario Mínimo vs Ingreso Promedio 2025
-      </h3>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart
-          data={data}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 60,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="pais" 
-            angle={-45}
-            textAnchor="end"
-            height={80}
-            fontSize={12}
-          />
-          <YAxis 
-            label={{ value: 'USD ($)', angle: -90, position: 'insideLeft' }}
-            fontSize={12}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend />
-          <Bar 
-            dataKey="salarioMinimo" 
-            fill="#3B82F6" 
-            name="Salario Mínimo"
-            radius={[2, 2, 0, 0]}
-          />
-          <Bar 
-            dataKey="ingresoPromedio" 
-            fill="#10B981" 
-            name="Ingreso Promedio"
-            radius={[2, 2, 0, 0]}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="chart-container">
+      {/* Header del gráfico */}
+      <div className="chart-header">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="chart-title">
+              💰 Salario Mínimo vs Ingreso Promedio 2025
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Comparación de salarios mínimos e ingresos promedio en Sudamérica
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contenedor del gráfico */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart
+            data={data}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 60,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="pais" 
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              fontSize={12}
+            />
+            <YAxis 
+              label={{ value: 'USD ($)', angle: -90, position: 'insideLeft' }}
+              fontSize={12}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            <Bar 
+              dataKey="salarioMinimo" 
+              fill="#3B82F6" 
+              name="Salario Mínimo"
+              radius={[2, 2, 0, 0]}
+            />
+            <Bar 
+              dataKey="ingresoPromedio" 
+              fill="#10B981" 
+              name="Ingreso Promedio"
+              radius={[2, 2, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
     </div>
   );
 };
