@@ -244,78 +244,7 @@ const TimelineComparison = () => {
   }, []);
 
   // Datos de población total estimada (para calcular PEA absoluta)
-  const populationData = {
-    'Argentina': {
-      2010: 40.4, 2011: 40.8, 2012: 41.3, 2013: 41.7, 2014: 42.1,
-      2015: 43.3, 2016: 43.5, 2017: 43.8, 2018: 44.0, 2019: 44.3,
-      2020: 44.5, 2021: 44.8, 2022: 45.0, 2023: 45.3, 2024: 45.5
-    },
-    'Brazil': {
-      2010: 195.5, 2011: 197.4, 2012: 199.2, 2013: 201.0, 2014: 202.8,
-      2015: 205.9, 2016: 206.8, 2017: 207.7, 2018: 208.5, 2019: 209.5,
-      2020: 211.0, 2021: 212.1, 2022: 213.2, 2023: 214.3, 2024: 215.3
-    },
-    'Brasil': {
-      2010: 195.5, 2011: 197.4, 2012: 199.2, 2013: 201.0, 2014: 202.8,
-      2015: 205.9, 2016: 206.8, 2017: 207.7, 2018: 208.5, 2019: 209.5,
-      2020: 211.0, 2021: 212.1, 2022: 213.2, 2023: 214.3, 2024: 215.3
-    },
-    'Chile': {
-      2010: 17.1, 2011: 17.3, 2012: 17.5, 2013: 17.6, 2014: 17.8,
-      2015: 18.6, 2016: 18.7, 2017: 18.8, 2018: 18.9, 2019: 19.0,
-      2020: 19.1, 2021: 19.2, 2022: 19.3, 2023: 19.4, 2024: 19.5
-    },
-    'Colombia': {
-      2010: 45.5, 2011: 46.0, 2012: 46.4, 2013: 46.8, 2014: 47.2,
-      2015: 47.0, 2016: 47.5, 2017: 48.0, 2018: 48.5, 2019: 49.0,
-      2020: 49.5, 2021: 50.0, 2022: 50.5, 2023: 51.0, 2024: 51.5
-    },
-    'Peru': {
-      2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
-      2015: 31.2, 2016: 31.4, 2017: 31.6, 2018: 31.8, 2019: 32.0,
-      2020: 32.2, 2021: 32.4, 2022: 32.6, 2023: 32.8, 2024: 33.0
-    },
-    'Perú': {
-      2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
-      2015: 31.2, 2016: 31.4, 2017: 31.6, 2018: 31.8, 2019: 32.0,
-      2020: 32.2, 2021: 32.4, 2022: 32.6, 2023: 32.8, 2024: 33.0
-    },
-    'Bolivia': {
-      2010: 10.4, 2011: 10.6, 2012: 10.8, 2013: 11.0, 2014: 11.2,
-      2015: 11.4, 2016: 11.6, 2017: 11.8, 2018: 12.0, 2019: 12.2,
-      2020: 12.4, 2021: 12.6, 2022: 12.8, 2023: 13.0, 2024: 13.2
-    },
-    'Venezuela': {
-      2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
-      2015: 31.0, 2016: 31.4, 2017: 31.8, 2018: 32.2, 2019: 28.2,
-      2020: 28.4, 2021: 28.6, 2022: 28.8, 2023: 29.0, 2024: 29.2
-    },
-    'Ecuador': {
-      2010: 15.7, 2011: 15.9, 2012: 16.1, 2013: 16.3, 2014: 16.5,
-      2015: 16.8, 2016: 17.0, 2017: 17.2, 2018: 17.4, 2019: 17.6,
-      2020: 17.8, 2021: 18.0, 2022: 18.2, 2023: 18.4, 2024: 18.6
-    },
-    'Paraguay': {
-      2010: 6.5, 2011: 6.6, 2012: 6.7, 2013: 6.8, 2014: 6.9,
-      2015: 7.0, 2016: 7.1, 2017: 7.2, 2018: 7.3, 2019: 7.4,
-      2020: 7.5, 2021: 7.6, 2022: 7.7, 2023: 7.8, 2024: 7.9
-    },
-    'Uruguay': {
-      2010: 3.4, 2011: 3.4, 2012: 3.4, 2013: 3.4, 2014: 3.4,
-      2015: 3.5, 2016: 3.5, 2017: 3.5, 2018: 3.5, 2019: 3.5,
-      2020: 3.5, 2021: 3.5, 2022: 3.5, 2023: 3.5, 2024: 3.5
-    },
-    'Guyana': {
-      2010: 0.8, 2011: 0.8, 2012: 0.8, 2013: 0.8, 2014: 0.8,
-      2015: 0.8, 2016: 0.8, 2017: 0.8, 2018: 0.8, 2019: 0.8,
-      2020: 0.8, 2021: 0.8, 2022: 0.8, 2023: 0.8, 2024: 0.8
-    },
-    'Suriname': {
-      2010: 0.5, 2011: 0.5, 2012: 0.5, 2013: 0.5, 2014: 0.5,
-      2015: 0.6, 2016: 0.6, 2017: 0.6, 2018: 0.6, 2019: 0.6,
-      2020: 0.6, 2021: 0.6, 2022: 0.6, 2023: 0.6, 2024: 0.6
-    }
-  };
+  
 
   // Construir array de años disponibles
   const availableYearsArray = useMemo(() => {
@@ -355,15 +284,6 @@ const TimelineComparison = () => {
       if (!grouped[key]) {
         grouped[key] = { year: item.year };
       }
-
-      // Obtener población total estimada (buscar con múltiples nombres posibles)
-      const totalPopulation = populationData[item.country]?.[item.year] ||
-        populationData[getDatasetCountryName(item.country)]?.[item.year] ||
-        populationData[normalizeCountryName(item.country)]?.[item.year] || 0;
-
-      // Calcular población económicamente activa en millones
-      const activePop = (item.participationRate / 100) * totalPopulation;
-      grouped[key][`activePop${item.sex}`] = activePop;
       grouped[key][`participationRate${item.sex}`] = item.participationRate;
     });
 
@@ -382,23 +302,12 @@ const TimelineComparison = () => {
     });
 
     return Object.values(grouped)
-      .filter(item => item.activePopMale !== undefined && item.activePopFemale !== undefined)
+      .filter(item => item.participationRateMale !== undefined && item.participationRateFemale !== undefined)
       .sort((a, b) => a.year - b.year);
   }, [selectedCountry, selectedYearRange, laborForceData, salaryData, loading]);
 
   // Configuración de métricas disponibles
   const metricsConfig = [
-    {
-      id: 'totalPEA',
-      title: 'PEA Total Actual',
-      icon: HiOutlineUsers,
-      color: 'blue',
-      formatter: (value) => `${value.toFixed(1)}M`,
-      calculate: (latest, first) => ({
-        value: (latest?.activePopMale || 0) + (latest?.activePopFemale || 0),
-        firstValue: (first?.activePopMale || 0) + (first?.activePopFemale || 0)
-      })
-    },
     {
       id: 'avgSalary',
       title: 'Salario Promedio',
@@ -433,28 +342,6 @@ const TimelineComparison = () => {
       })
     },
     {
-      id: 'malePEA',
-      title: 'PEA Masculina',
-      icon: HiOutlineUsers,
-      color: 'blue',
-      formatter: (value) => `${value.toFixed(1)}M`,
-      calculate: (latest, first) => ({
-        value: latest?.activePopMale || 0,
-        firstValue: first?.activePopMale || 0
-      })
-    },
-    {
-      id: 'femalePEA',
-      title: 'PEA Femenina',
-      icon: HiOutlineUsers,
-      color: 'purple',
-      formatter: (value) => `${value.toFixed(1)}M`,
-      calculate: (latest, first) => ({
-        value: latest?.activePopFemale || 0,
-        firstValue: first?.activePopFemale || 0
-      })
-    },
-    {
       id: 'maleSalary',
       title: 'Salario Masculino',
       icon: HiOutlineCurrencyDollar,
@@ -474,28 +361,6 @@ const TimelineComparison = () => {
       calculate: (latest, first) => ({
         value: latest?.salaryFemale || 0,
         firstValue: first?.salaryFemale || 0
-      })
-    },
-    {
-      id: 'participationRatio',
-      title: 'Ratio PEA M/F',
-      icon: HiOutlineScale,
-      color: 'indigo',
-      formatter: (value) => `${value.toFixed(2)}:1`,
-      calculate: (latest, first) => ({
-        value: (latest?.activePopMale || 0) / (latest?.activePopFemale || 1),
-        firstValue: (first?.activePopMale || 0) / (first?.activePopFemale || 1)
-      })
-    },
-    {
-      id: 'salaryRatio',
-      title: 'Ratio Salario M/F',
-      icon: HiOutlineScale,
-      color: 'green',
-      formatter: (value) => `${value.toFixed(2)}:1`,
-      calculate: (latest, first) => ({
-        value: (latest?.salaryMale || 0) / (latest?.salaryFemale || 1),
-        firstValue: (first?.salaryMale || 0) / (first?.salaryFemale || 1)
       })
     },
     {
@@ -522,18 +387,17 @@ const TimelineComparison = () => {
     }
   ];
 
-  // Métricas seleccionadas por defecto (se pueden modificar fácilmente)
+  // Métricas seleccionadas por defecto
   const [selectedMetrics, setSelectedMetrics] = useState([
-    'totalPEA', 'avgSalary', 'peaGap', 'salaryGap', 'yearRange', 'dataPoints'
+    'avgSalary', 'peaGap', 'salaryGap', 'maleSalary', 'femaleSalary', 'yearRange', 'dataPoints'
   ]);
 
   // Configuraciones predefinidas de métricas
   const metricsPresets = {
-    principales: ['totalPEA', 'avgSalary', 'peaGap', 'salaryGap'],
-    completas: ['totalPEA', 'avgSalary', 'peaGap', 'salaryGap', 'yearRange', 'dataPoints'],
-    genero: ['malePEA', 'femalePEA', 'maleSalary', 'femaleSalary'],
-    brechas: ['peaGap', 'salaryGap', 'participationRatio', 'salaryRatio'],
-    ratios: ['participationRatio', 'salaryRatio'],
+    principales: ['avgSalary', 'peaGap', 'salaryGap'],
+    completas: ['avgSalary', 'peaGap', 'salaryGap', 'maleSalary', 'femaleSalary', 'yearRange', 'dataPoints'],
+    genero: ['maleSalary', 'femaleSalary'],
+    brechas: ['peaGap', 'salaryGap'],
     todas: metricsConfig.map(m => m.id)
   };
 
@@ -716,13 +580,10 @@ const TimelineComparison = () => {
                     <button
                       key={metric.id}
                       type="button"
-                      className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
-                        ${selectedMetrics.includes(metric.id)
-                          ? "bg-[#e5e5e5] border-[#888] text-black"
-                          : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                      className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors`}
                       style={{
-                        backgroundColor: selectedMetrics.includes(metric.id) ? '#007bff' : '#fff',
-                        color: selectedMetrics.includes(metric.id) ? '#fff' : '#007bff',
+                        backgroundColor: selectedMetrics[0] === metric.id ? '#007bff' : '#fff',
+                        color: selectedMetrics[0] === metric.id ? '#fff' : '#007bff',
                         border: '1px solid #007bff',
                         padding: '10px 20px',
                         borderRadius: '8px',
@@ -734,16 +595,10 @@ const TimelineComparison = () => {
                         outline: 'none',
                         margin: '8px 8px 8px 0',
                       }}
-                      onClick={() => {
-                        setSelectedMetrics(prev =>
-                          prev.includes(metric.id)
-                            ? prev.filter(id => id !== metric.id)
-                            : [...prev, metric.id]
-                        );
-                      }}
+                      onClick={() => setSelectedMetrics([metric.id])}
                     >
                       <span className="truncate">{metric.title}</span>
-                      {selectedMetrics.includes(metric.id) && (
+                      {selectedMetrics[0] === metric.id && (
                         <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
                           <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
                           <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -766,140 +621,27 @@ const TimelineComparison = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => applyMetricsPreset('todas')}
-                  type="button"
-                  style={{
-                    backgroundColor: selectedMetrics.length === metricsConfig.length ? '#007bff' : '#fff',
-                    color: selectedMetrics.length === metricsConfig.length ? '#fff' : '#007bff',
-                    border: '1px solid #007bff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: 'normal',
-                    fontSize: '16px',
-                    boxShadow: 'none',
-                    cursor: 'pointer',
-                    minWidth: 90,
-                    outline: 'none',
-                    margin: '8px 8px 8px 0',
-                  }}
-                  className="transition-colors"
+                  className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   Todas
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('principales')}
-                  type="button"
-                  style={{
-                    backgroundColor:
-                      selectedMetrics.length === metricsPresets.principales.length &&
-                      metricsPresets.principales.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
-                        : '#fff',
-                    color:
-                      selectedMetrics.length === metricsPresets.principales.length &&
-                      metricsPresets.principales.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: 'normal',
-                    fontSize: '16px',
-                    boxShadow: 'none',
-                    cursor: 'pointer',
-                    minWidth: 90,
-                    outline: 'none',
-                    margin: '8px 8px 8px 0',
-                  }}
-                  className="transition-colors"
+                  className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                 >
                   Principales
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('genero')}
-                  type="button"
-                  style={{
-                    backgroundColor:
-                      selectedMetrics.length === metricsPresets.genero.length &&
-                      metricsPresets.genero.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
-                        : '#fff',
-                    color:
-                      selectedMetrics.length === metricsPresets.genero.length &&
-                      metricsPresets.genero.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: 'normal',
-                    fontSize: '16px',
-                    boxShadow: 'none',
-                    cursor: 'pointer',
-                    minWidth: 90,
-                    outline: 'none',
-                    margin: '8px 8px 8px 0',
-                  }}
-                  className="transition-colors"
+                  className="px-3 py-1 text-xs bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
                 >
                   Por Género
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('brechas')}
-                  type="button"
-                  style={{
-                    backgroundColor:
-                      selectedMetrics.length === metricsPresets.brechas.length &&
-                      metricsPresets.brechas.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
-                        : '#fff',
-                    color:
-                      selectedMetrics.length === metricsPresets.brechas.length &&
-                      metricsPresets.brechas.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: 'normal',
-                    fontSize: '16px',
-                    boxShadow: 'none',
-                    cursor: 'pointer',
-                    minWidth: 90,
-                    outline: 'none',
-                    margin: '8px 8px 8px 0',
-                  }}
-                  className="transition-colors"
+                  className="px-3 py-1 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                 >
                   Brechas
-                </button>
-                <button
-                  onClick={() => applyMetricsPreset('ratios')}
-                  type="button"
-                  style={{
-                    backgroundColor:
-                      selectedMetrics.length === metricsPresets.ratios.length &&
-                      metricsPresets.ratios.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
-                        : '#fff',
-                    color:
-                      selectedMetrics.length === metricsPresets.ratios.length &&
-                      metricsPresets.ratios.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: 'normal',
-                    fontSize: '16px',
-                    boxShadow: 'none',
-                    cursor: 'pointer',
-                    minWidth: 90,
-                    outline: 'none',
-                    margin: '8px 8px 8px 0',
-                  }}
-                  className="transition-colors"
-                >
-                  Ratios
                 </button>
               </div>
             </div>
@@ -978,7 +720,7 @@ const TimelineComparison = () => {
                       yAxisId="left"
                       stroke="#666"
                       fontSize={12}
-                      label={{ value: 'Millones de personas', angle: -90, position: 'insideLeft' }}
+                      label={{ value: 'Tasa de participación (%)', angle: -90, position: 'insideLeft' }}
                     />
                     <YAxis
                       yAxisId="right"
@@ -991,16 +733,16 @@ const TimelineComparison = () => {
                     <Legend />
                     <Bar
                       yAxisId="left"
-                      dataKey="activePopMale"
+                      dataKey="participationRateMale"
                       fill="#3B82F6"
-                      name="PEA Masculina"
+                      name="PEA Masculina (%)"
                       opacity={0.6}
                     />
                     <Bar
                       yAxisId="left"
-                      dataKey="activePopFemale"
+                      dataKey="participationRateFemale"
                       fill="#EC4899"
-                      name="PEA Femenina"
+                      name="PEA Femenina (%)"
                       opacity={0.6}
                     />
                     <Line
