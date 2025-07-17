@@ -2,6 +2,8 @@ import React from 'react';
 import MapaCoropleticoEmpleoInformal from './MapaCoropleticoEmpleoInformal';
 import GraficoBarrasSalarios from './GraficoBarrasSalarios';
 import DotPlotParticipacionLaboral from './DotPlotParticipacionLaboral';
+import InformalityAnalysis from './InformalityAnalysis';
+import TimelineComparison from './TimelineComparison';
 
 const ContenedorGraficos = ({
   informalEmploymentMapData,
@@ -11,7 +13,7 @@ const ContenedorGraficos = ({
   return (
     <div className="space-y-8">
       {/* Mapa Coroplético de Empleo Informal */}
-      <MapaCoropleticoEmpleoInformal 
+      <MapaCoropleticoEmpleoInformal
         data={informalEmploymentMapData}
         loading={loading}
         error={error}
@@ -20,7 +22,15 @@ const ContenedorGraficos = ({
       {/* Gráfico de Barras - Salario Mínimo vs Ingreso Promedio */}
       <GraficoBarrasSalarios />
 
-      <DotPlotParticipacionLaboral/>
+      {/* Dot Plot - Participación Laboral por Género */}
+      <DotPlotParticipacionLaboral />
+
+      {/* Análisis de Informalidad */}
+      <InformalityAnalysis />
+
+      {/* Comparación de Líneas de Tiempo */}
+      <TimelineComparison />
+
     </div>
   );
 };
