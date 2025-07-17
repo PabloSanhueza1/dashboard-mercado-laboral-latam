@@ -210,7 +210,7 @@ const InformalityAnalysis = () => {
       )}
 
       {/* Gráficos principales */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Comparación por sexo */}
         <div className="bg-white rounded-lg p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">

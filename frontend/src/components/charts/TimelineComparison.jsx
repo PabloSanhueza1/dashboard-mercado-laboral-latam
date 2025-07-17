@@ -657,47 +657,6 @@ const TimelineComparison = () => {
 
         {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Gráfico de PEA por sexo */}
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-600 text-gray-800 mb-4 flex items-center gap-2">
-              <HiOutlineUsers className="w-5 h-5 text-blue-600" />
-              Población Económicamente Activa por Sexo
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={processedData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="year" 
-                  stroke="#666" 
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="#666" 
-                  fontSize={12}
-                  label={{ value: 'Millones de personas', angle: -90, position: 'insideLeft' }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="activePopMale" 
-                  stroke="#3B82F6" 
-                  strokeWidth={3}
-                  name="PEA Masculina"
-                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="activePopFemale" 
-                  stroke="#EC4899" 
-                  strokeWidth={3}
-                  name="PEA Femenina"
-                  dot={{ fill: '#EC4899', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
           {/* Gráfico de salarios por sexo */}
           <div className="glass-card p-6">
             <h3 className="text-lg font-600 text-gray-800 mb-4 flex items-center gap-2">
