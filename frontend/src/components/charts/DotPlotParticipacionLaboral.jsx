@@ -247,8 +247,30 @@ const DotPlotParticipacionLaboral = () => {
                     </div>
                 </div>
                 {filteredData.length === 0 ? (
-                    <div className="flex items-center justify-center h-full w-full absolute top-0 left-0 z-20">
-                        <span className="text-gray-500 text-lg font-semibold">No hay datos</span>
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "100%",
+                            height: "100%",
+                            minHeight: 300,
+                            background: "rgba(255,255,255,0.85)",
+                            zIndex: 20
+                        }}
+                    >
+                        <span
+                            className="font-bold"
+                            style={{
+                                fontSize: "2.2rem",
+                                color: "#2563eb",
+                                textShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                textAlign: "center"
+                            }}
+                        >
+                            No datos de {countryDisplayNames[selectedCountry] || selectedCountry} en {selectedYear}
+                        </span>
                     </div>
                 ) : (
                     <ResponsiveContainer>
@@ -295,7 +317,7 @@ const DotPlotParticipacionLaboral = () => {
                     </ResponsiveContainer>
                 )}
             </div>
-            {/* Slider de año centrado y más largo */}
+            {/* Slider de año */}
             <div className="flex flex-col items-center w-full mt-6">
                 <label className="text-xs text-gray-500 mb-2">
                     Año: <span className="font-semibold text-blue-700">{selectedYear}</span>
