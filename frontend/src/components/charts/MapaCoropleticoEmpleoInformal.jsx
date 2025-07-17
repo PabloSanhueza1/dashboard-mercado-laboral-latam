@@ -397,7 +397,7 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
         <div className="text-xs text-blue-800 space-y-2">
           {/* Guía de interpretación */}
           <div className="mt-4 p-3 bg-white rounded-lg border border-blue-300">
-            <h4 className="font-semibold text-blue-900 mb-3 text-sm">🎯 Guía de Interpretación</h4>
+            <h4 className="font-semibold text-blue-900 mb-3 text-sm"> Guía de Interpretación</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-green-600 rounded"></div>
