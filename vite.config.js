@@ -3,6 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: "pablosanhueza1.github.io/dashboard-mercado-laboral-latam",
+  base: "https://pablosanhueza1.github.io/dashboard-mercado-laboral-latam",
 })
 // ...existing config...
