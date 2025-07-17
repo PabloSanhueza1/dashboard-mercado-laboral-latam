@@ -557,31 +557,32 @@ const TimelineComparison = () => {
   };
 
   return (
-    <div className="timeline-comparison-container">
+    <div className="chart-container">
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-16 text-white">
-            <HiOutlineUsers className="w-6 h-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-700 text-gray-800">
-              Comparación Temporal: PEA vs Salarios
-            </h2>
-            <p className="text-gray-600 mt-1">
-              Análisis de población económicamente activa (15+ años) y salarios promedio por sexo (2000-2024)
-            </p>
-          </div>
-        </div>
-
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             <span className="ml-2 text-gray-600">Cargando datos...</span>
           </div>
         ) : (
-          <>
+          <div className="bg-white bg-opacity-90 rounded-2xl border border-gray-200 shadow-lg p-6">
+            {/* Título y descripción */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-16 text-white">
+                <HiOutlineUsers className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-700 text-gray-800">
+                  Comparación Temporal: PEA vs Salarios
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  Análisis de población económicamente activa (15+ años) y salarios promedio por sexo (2000-2024)
+                </p>
+              </div>
+            </div>
+
             {/* Filtros integrados */}
-            <div className="glass-card p-6 mb-6">
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
               <div className="flex flex-wrap gap-4 items-center">
                 {/* Selector de país */}
                 <div className="flex items-center gap-2">
@@ -598,245 +599,245 @@ const TimelineComparison = () => {
                   </select>
                 </div>
 
-            {/* Selector de rango de años */}
-            <div className="flex items-center gap-2">
-              <HiOutlineCalendar className="w-5 h-5 text-gray-500" />
-              <label className="text-sm font-medium text-gray-700">Año inicio:</label>
-              <select 
-                value={selectedYearRange.start} 
-                onChange={(e) => setSelectedYearRange({...selectedYearRange, start: parseInt(e.target.value)})}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-              <span className="text-gray-500">a</span>
-              <select 
-                value={selectedYearRange.end} 
-                onChange={(e) => setSelectedYearRange({...selectedYearRange, end: parseInt(e.target.value)})}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+                {/* Selector de rango de años */}
+                <div className="flex items-center gap-2">
+                  <HiOutlineCalendar className="w-5 h-5 text-gray-500" />
+                  <label className="text-sm font-medium text-gray-700">Año inicio:</label>
+                  <select 
+                    value={selectedYearRange.start} 
+                    onChange={(e) => setSelectedYearRange({...selectedYearRange, start: parseInt(e.target.value)})}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  <span className="text-gray-500">a</span>
+                  <select 
+                    value={selectedYearRange.end} 
+                    onChange={(e) => setSelectedYearRange({...selectedYearRange, end: parseInt(e.target.value)})}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-          {/* Selector de métricas */}
-          <div className="flex flex-wrap items-center gap-2 mt-4">
-            <label className="text-sm font-medium text-gray-700">Métricas:</label>
-            <div className="flex flex-wrap gap-2">
-              {metricsConfig.slice(0, 8).map(metric => (
+              {/* Selector de métricas */}
+              <div className="flex flex-wrap items-center gap-2 mt-4">
+                <label className="text-sm font-medium text-gray-700">Métricas:</label>
+                <div className="flex flex-wrap gap-2">
+                  {metricsConfig.slice(0, 8).map(metric => (
+                    <button
+                      key={metric.id}
+                      onClick={() => {
+                        setSelectedMetrics(prev => 
+                          prev.includes(metric.id) 
+                            ? prev.filter(id => id !== metric.id)
+                            : [...prev, metric.id]
+                        );
+                      }}
+                      className={`px-3 py-1 text-xs rounded-full border transition-all duration-200 ${
+                        selectedMetrics.includes(metric.id)
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'bg-white text-gray-600 border-gray-300 hover:border-blue-500'
+                      }`}
+                    >
+                      {metric.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Selector de vista de métricas */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Métricas seleccionadas:</span>
+                <span className="text-sm text-gray-500">
+                  {selectedMetrics.length} de {metricsConfig.length} disponibles
+                </span>
+              </div>
+              <div className="flex gap-2">
                 <button
-                  key={metric.id}
-                  onClick={() => {
-                    setSelectedMetrics(prev => 
-                      prev.includes(metric.id) 
-                        ? prev.filter(id => id !== metric.id)
-                        : [...prev, metric.id]
-                    );
-                  }}
-                  className={`px-3 py-1 text-xs rounded-full border transition-all duration-200 ${
-                    selectedMetrics.includes(metric.id)
-                      ? 'bg-blue-500 text-white border-blue-500'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-blue-500'
-                  }`}
+                  onClick={() => applyMetricsPreset('todas')}
+                  className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  {metric.title}
+                  Todas
                 </button>
+                <button
+                  onClick={() => applyMetricsPreset('principales')}
+                  className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Principales
+                </button>
+                <button
+                  onClick={() => applyMetricsPreset('genero')}
+                  className="px-3 py-1 text-xs bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                >
+                  Por Género
+                </button>
+                <button
+                  onClick={() => applyMetricsPreset('brechas')}
+                  className="px-3 py-1 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  Brechas
+                </button>
+                <button
+                  onClick={() => applyMetricsPreset('ratios')}
+                  className="px-3 py-1 text-xs bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                >
+                  Ratios
+                </button>
+              </div>
+            </div>
+
+            {/* Métricas clave dinámicas */}
+            <div className="stats-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+              {calculateMetrics.map((metric) => (
+                <StatCard 
+                  key={metric.id}
+                  title={metric.title}
+                  value={metric.value}
+                  icon={metric.icon}
+                  color={metric.color}
+                  trend={metric.trend}
+                />
               ))}
             </div>
-          </div>
-        </div>
 
-        {/* Selector de vista de métricas */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Métricas seleccionadas:</span>
-            <span className="text-sm text-gray-500">
-              {selectedMetrics.length} de {metricsConfig.length} disponibles
-            </span>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => applyMetricsPreset('todas')}
-              className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Todas
-            </button>
-            <button
-              onClick={() => applyMetricsPreset('principales')}
-              className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-            >
-              Principales
-            </button>
-            <button
-              onClick={() => applyMetricsPreset('genero')}
-              className="px-3 py-1 text-xs bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-            >
-              Por Género
-            </button>
-            <button
-              onClick={() => applyMetricsPreset('brechas')}
-              className="px-3 py-1 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              Brechas
-            </button>
-            <button
-              onClick={() => applyMetricsPreset('ratios')}
-              className="px-3 py-1 text-xs bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
-            >
-              Ratios
-            </button>
-          </div>
-        </div>
+            {/* Sección de Gráficos */}
+            <div className="bg-gray-50 p-6 rounded-lg">
+              {/* Gráfico de salarios por sexo */}
+              <div className="mb-8">
+                <h3 className="text-lg font-600 text-gray-800 mb-4 flex items-center gap-2">
+                  <HiOutlineCurrencyDollar className="w-5 h-5 text-green-600" />
+                  Salarios Promedio por Sexo (USD)
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={processedData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="year" 
+                      stroke="#666" 
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="#666" 
+                      fontSize={12}
+                      label={{ value: 'USD', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="salaryMale" 
+                      stroke="#10B981" 
+                      strokeWidth={3}
+                      name="Salario Masculino"
+                      dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="salaryFemale" 
+                      stroke="#F59E0B" 
+                      strokeWidth={3}
+                      name="Salario Femenino"
+                      dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
 
-        {/* Métricas clave dinámicas */}
-        <div className="stats-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          {calculateMetrics.map((metric) => (
-            <StatCard 
-              key={metric.id}
-              title={metric.title}
-              value={metric.value}
-              icon={metric.icon}
-              color={metric.color}
-              trend={metric.trend}
-            />
-          ))}
-        </div>
-
-        {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Gráfico de salarios por sexo */}
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-600 text-gray-800 mb-4 flex items-center gap-2">
-              <HiOutlineCurrencyDollar className="w-5 h-5 text-green-600" />
-              Salarios Promedio por Sexo (USD)
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={processedData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="year" 
-                  stroke="#666" 
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="#666" 
-                  fontSize={12}
-                  label={{ value: 'USD', angle: -90, position: 'insideLeft' }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="salaryMale" 
-                  stroke="#10B981" 
-                  strokeWidth={3}
-                  name="Salario Masculino"
-                  dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="salaryFemale" 
-                  stroke="#F59E0B" 
-                  strokeWidth={3}
-                  name="Salario Femenino"
-                  dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Gráfico combinado */}
-        <div className="glass-card p-6 mt-6">
-          <h3 className="text-lg font-600 text-gray-800 mb-4">
-            Análisis Combinado: PEA vs Salarios
-          </h3>
-          <ResponsiveContainer width="100%" height={400}>
-            <ComposedChart data={processedData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="year" 
-                stroke="#666" 
-                fontSize={12}
-              />
-              <YAxis 
-                yAxisId="left"
-                stroke="#666" 
-                fontSize={12}
-                label={{ value: 'Millones de personas', angle: -90, position: 'insideLeft' }}
-              />
-              <YAxis 
-                yAxisId="right"
-                orientation="right"
-                stroke="#666" 
-                fontSize={12}
-                label={{ value: 'USD', angle: 90, position: 'insideRight' }}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Bar 
-                yAxisId="left"
-                dataKey="activePopMale" 
-                fill="#3B82F6" 
-                name="PEA Masculina"
-                opacity={0.6}
-              />
-              <Bar 
-                yAxisId="left"
-                dataKey="activePopFemale" 
-                fill="#EC4899" 
-                name="PEA Femenina"
-                opacity={0.6}
-              />
-              <Line 
-                yAxisId="right"
-                type="monotone" 
-                dataKey="salaryMale" 
-                stroke="#10B981" 
-                strokeWidth={3}
-                name="Salario Masculino"
-                dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-              />
-              <Line 
-                yAxisId="right"
-                type="monotone" 
-                dataKey="salaryFemale" 
-                stroke="#F59E0B" 
-                strokeWidth={3}
-                name="Salario Femenino"
-                dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Panel de información */}
-        <div className="glass-card p-6 mt-6">
-          <div className="flex items-center gap-3 mb-4">
-            <HiOutlineInformationCircle className="w-6 h-6 text-blue-600" />
-            <h3 className="text-lg font-600 text-gray-800">Información del Análisis</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div>
-              <p><strong>Población Económicamente Activa (PEA):</strong> Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.</p>
-              <p className="mt-2"><strong>Salarios en USD:</strong> Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.</p>
+              {/* Gráfico combinado */}
+              <div>
+                <h3 className="text-lg font-600 text-gray-800 mb-4">
+                  Análisis Combinado: PEA vs Salarios
+                </h3>
+                <ResponsiveContainer width="100%" height={400}>
+                  <ComposedChart data={processedData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="year" 
+                      stroke="#666" 
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      yAxisId="left"
+                      stroke="#666" 
+                      fontSize={12}
+                      label={{ value: 'Millones de personas', angle: -90, position: 'insideLeft' }}
+                    />
+                    <YAxis 
+                      yAxisId="right"
+                      orientation="right"
+                      stroke="#666" 
+                      fontSize={12}
+                      label={{ value: 'USD', angle: 90, position: 'insideRight' }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    <Bar 
+                      yAxisId="left"
+                      dataKey="activePopMale" 
+                      fill="#3B82F6" 
+                      name="PEA Masculina"
+                      opacity={0.6}
+                    />
+                    <Bar 
+                      yAxisId="left"
+                      dataKey="activePopFemale" 
+                      fill="#EC4899" 
+                      name="PEA Femenina"
+                      opacity={0.6}
+                    />
+                    <Line 
+                      yAxisId="right"
+                      type="monotone" 
+                      dataKey="salaryMale" 
+                      stroke="#10B981" 
+                      strokeWidth={3}
+                      name="Salario Masculino"
+                      dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                    />
+                    <Line 
+                      yAxisId="right"
+                      type="monotone" 
+                      dataKey="salaryFemale" 
+                      stroke="#F59E0B" 
+                      strokeWidth={3}
+                      name="Salario Femenino"
+                      dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <div>
-              <p><strong>Brecha de PEA:</strong> Diferencia entre la tasa de participación laboral masculina y femenina, indicando disparidades en el acceso al mercado laboral.</p>
-              <p className="mt-2"><strong>Brecha Salarial:</strong> Diferencia entre los salarios promedio de hombres y mujeres, reflejando desigualdades en la remuneración.</p>
+
+            {/* Panel de información */}
+            <div className="bg-gray-50 p-6 rounded-lg mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <HiOutlineInformationCircle className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-600 text-gray-800">Información del Análisis</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <div>
+                  <p><strong>Población Económicamente Activa (PEA):</strong> Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.</p>
+                  <p className="mt-2"><strong>Salarios en USD:</strong> Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.</p>
+                </div>
+                <div>
+                  <p><strong>Brecha de PEA:</strong> Diferencia entre la tasa de participación laboral masculina y femenina, indicando disparidades en el acceso al mercado laboral.</p>
+                  <p className="mt-2"><strong>Brecha Salarial:</strong> Diferencia entre los salarios promedio de hombres y mujeres, reflejando desigualdades en la remuneración.</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default TimelineComparison;

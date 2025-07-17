@@ -15,9 +15,9 @@ export const StatCard = ({ title, value, icon: Icon, color = 'blue', trend }) =>
   };
 
   return (
-    <div className="stat-card group relative bg-white bg-opacity-80 rounded-xl border p-5 shadow hover:shadow-lg transition-all duration-200">
+    <div className="stat-card group relative bg-white bg-opacity-80 rounded-xl border p-5 shadow">
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-xl ${colorClasses[color].split(' ').slice(2).join(' ')} border transition-all duration-300 group-hover:scale-110`}>
+        <div className={`p-3 rounded-xl ${colorClasses[color].split(' ').slice(2).join(' ')} border`}>
           <Icon className="w-6 h-6" />
         </div>
         {trend !== undefined && trend !== null && (
@@ -32,7 +32,7 @@ export const StatCard = ({ title, value, icon: Icon, color = 'blue', trend }) =>
         <div className="stat-value text-2xl font-bold text-gray-800">{value}</div>
         <div className="stat-label text-gray-500">{title}</div>
       </div>
-      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${colorClasses[color].split(' ').slice(0, 2).join(' ')} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${colorClasses[color].split(' ').slice(0, 2).join(' ')}`}></div>
     </div>
   );
 };
