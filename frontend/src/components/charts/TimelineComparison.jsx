@@ -245,7 +245,7 @@ const TimelineComparison = () => {
   }, []);
 
   // Datos de población total estimada (para calcular PEA absoluta)
-  
+
 
   // Construir array de años disponibles
   const availableYearsArray = useMemo(() => {
@@ -581,10 +581,13 @@ const TimelineComparison = () => {
                     <button
                       key={metric.id}
                       type="button"
-                      className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors`}
+                      className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
+                        ${selectedMetrics.includes(metric.id)
+                          ? "bg-[#e5e5e5] border-[#888] text-black"
+                          : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
                       style={{
-                        backgroundColor: selectedMetrics[0] === metric.id ? '#007bff' : '#fff',
-                        color: selectedMetrics[0] === metric.id ? '#fff' : '#007bff',
+                        backgroundColor: selectedMetrics.includes(metric.id) ? '#007bff' : '#fff',
+                        color: selectedMetrics.includes(metric.id) ? '#fff' : '#007bff',
                         border: '1px solid #007bff',
                         padding: '10px 20px',
                         borderRadius: '8px',
@@ -596,7 +599,7 @@ const TimelineComparison = () => {
                         outline: 'none',
                         margin: '8px 8px 8px 0',
                       }}
-                      onClick={() => setSelectedMetrics([metric.id])}
+                      onClick={() => setSelectedMetrics(prev => prev.includes(metric.id) ? prev.filter(id => id !== metric.id) : [...prev, metric.id])}
                     >
                       <span className="truncate">{metric.title}</span>
                       {selectedMetrics[0] === metric.id && (
@@ -622,26 +625,108 @@ const TimelineComparison = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => applyMetricsPreset('todas')}
-                  className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor: selectedMetrics.length === metricsConfig.length ? '#007bff' : '#fff',
+                    color: selectedMetrics.length === metricsConfig.length ? '#fff' : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Todas
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('principales')}
-                  className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.principales.length &&
+                        metricsPresets.principales.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.principales.length &&
+                        metricsPresets.principales.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Principales
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('genero')}
-                  className="px-3 py-1 text-xs bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-                >
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.genero.length &&
+                        metricsPresets.genero.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.genero.length &&
+                        metricsPresets.genero.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"                >
                   Por Género
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('brechas')}
-                  className="px-3 py-1 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                >
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.brechas.length &&
+                        metricsPresets.brechas.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.brechas.length &&
+                        metricsPresets.brechas.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"                >
                   Brechas
                 </button>
               </div>
@@ -798,7 +883,7 @@ const TimelineComparison = () => {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 
