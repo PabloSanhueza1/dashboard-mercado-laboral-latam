@@ -41,3 +41,250 @@
 .read-the-docs {
   color: #888;
 }
+
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #fb923c 0%, #fde68a 100%);
+  padding: 0;
+}
+
+.dashboard-content {
+  background: rgba(255, 247, 237, 0.96); /* fondo blanco cálido */
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid #fbbf24;
+  box-shadow: 0 25px 50px -12px rgba(251, 191, 36, 0.15);
+  overflow: hidden;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #ea580c 0%, #fbbf24 100%);
+  padding: 2rem;
+  color: #fff7ed;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  /* ...existing code... */
+}
+
+.dashboard-main {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 2rem;
+  padding: 2rem;
+}
+
+/* Glass Effect Cards */
+.glass-card {
+  background: rgba(255, 237, 213, 0.92);
+  border: 1px solid #fbbf24;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(251, 191, 36, 0.12);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(251, 191, 36, 0.18);
+}
+
+/* Modern Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #ea580c 0%, #fbbf24 100%);
+  color: #fff7ed;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.25);
+}
+
+.btn-secondary {
+  background: rgba(255, 237, 213, 0.95);
+  color: #b45309;
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #fff7ed;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.12);
+}
+
+/* Filter Section */
+.filter-section {
+  background: linear-gradient(135deg, #fff7ed 0%, #fde68a 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #fbbf24;
+}
+
+.filter-item {
+  background: #fff7ed;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #fbbf24;
+  transition: all 0.3s ease;
+}
+
+.filter-item:hover {
+  border-color: #ea580c;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.10);
+}
+
+/* Country Selection */
+.country-pill {
+  background: linear-gradient(135deg, #fde68a 0%, #fff7ed 100%);
+  color: #b45309;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.country-pill.selected {
+  background: linear-gradient(135deg, #ea580c 0%, #fbbf24 100%);
+  color: #fff7ed;
+  transform: scale(1.05);
+}
+
+.country-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.15);
+}
+
+/* Statistics Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #fff7ed 0%, #fde68a 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #fbbf24;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #ea580c, #fbbf24);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.13);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #b45309;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #ea580c;
+  font-weight: 500;
+}
+
+/* Chart Containers */
+.chart-container {
+  background: #fff7ed;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #fbbf24;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.07);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #fde68a;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Form Controls */
+.form-select, .form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  background: #fff7ed;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus, .form-input:focus {
+  outline: none;
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.13);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #b45309;
+  margin-bottom: 0.5rem;
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(135deg, #ea580c 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.backdrop-blur {
+  backdrop-filter: blur(20px);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.18);
+}
