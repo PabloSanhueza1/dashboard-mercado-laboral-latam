@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/dashboard-mercado-laboral-latam/docs/',
+  base: 'https://pablosanhueza1.github.io/dashboard-mercado-laboral-latam',
 })
