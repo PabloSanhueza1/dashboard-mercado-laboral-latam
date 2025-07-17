@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
+import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   ComposedChart, Bar, BarChart, ReferenceLine
 } from 'recharts';
-import { 
-  HiOutlineUsers, HiOutlineCurrencyDollar, HiOutlineFilter, HiOutlineCalendar, 
+import {
+  HiOutlineUsers, HiOutlineCurrencyDollar, HiOutlineFilter, HiOutlineCalendar,
   HiOutlineInformationCircle, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineScale
 } from 'react-icons/hi';
 import { StatCard } from '../estadisticas/ResumenEstadisticas';
+import { Range } from 'react-range';
 
 const TimelineComparison = () => {
   const [selectedCountry, setSelectedCountry] = useState('Argentina');
@@ -18,6 +19,22 @@ const TimelineComparison = () => {
   const [loading, setLoading] = useState(true);
   const [availableCountries, setAvailableCountries] = useState([]);
   const [availableYears, setAvailableYears] = useState({ min: 2010, max: 2023 });
+
+  const countryDisplayNames = {
+    'Argentina': 'Argentina',
+    'Brasil': 'Brasil',
+    'Perú': 'Perú',
+    'Bolivia': 'Bolivia',
+    'Venezuela': 'Venezuela',
+    'Chile': 'Chile',
+    'Colombia': 'Colombia',
+    'Ecuador': 'Ecuador',
+    'Paraguay': 'Paraguay',
+    'Uruguay': 'Uruguay',
+    'Guyana': 'Guyana',
+    'Suriname': 'Suriname',
+    'Guayana Francesa': 'Guayana Francesa'
+  };
 
   // Función para normalizar nombres de países
   const normalizeCountryName = (countryName) => {
@@ -65,21 +82,21 @@ const TimelineComparison = () => {
   const parseCSV = (text) => {
     const lines = text.split('\n');
     const result = [];
-    
+
     for (let i = 1; i < lines.length; i++) { // Skip header
       const line = lines[i].trim();
       if (!line) continue;
-      
+
       const cols = [];
       let current = '';
       let inQuotes = false;
-      
+
       for (let j = 0; j < line.length; j++) {
         const char = line[j];
-        
-        if (char === '"' && (j === 0 || line[j-1] === ',')) {
+
+        if (char === '"' && (j === 0 || line[j - 1] === ',')) {
           inQuotes = true;
-        } else if (char === '"' && inQuotes && (j === line.length - 1 || line[j+1] === ',')) {
+        } else if (char === '"' && inQuotes && (j === line.length - 1 || line[j + 1] === ',')) {
           inQuotes = false;
         } else if (char === ',' && !inQuotes) {
           cols.push(current.trim());
@@ -89,10 +106,10 @@ const TimelineComparison = () => {
         }
       }
       cols.push(current.trim());
-      
+
       result.push(cols);
     }
-    
+
     return result;
   };
 
@@ -101,10 +118,10 @@ const TimelineComparison = () => {
     try {
       const response = await fetch('/dataset/datos_sudamerica/poblacion_economicamente_activa_por_sexo_edad_sudamerica.csv');
       if (!response.ok) throw new Error('Error al cargar datos de PEA');
-      
+
       const text = await response.text();
       const rows = parseCSV(text);
-      
+
       const data = rows
         .map(cols => ({
           country: normalizeCountryName(cols[0]?.replace(/"/g, '').trim()),
@@ -114,17 +131,17 @@ const TimelineComparison = () => {
           year: parseInt(cols[5]),
           participationRate: parseFloat(cols[6])
         }))
-        .filter(item => 
-          item.country && 
-          item.sex && 
-          item.ageGroup && 
-          item.year && 
+        .filter(item =>
+          item.country &&
+          item.sex &&
+          item.ageGroup &&
+          item.year &&
           !isNaN(item.participationRate) &&
           item.ageGroup.includes('15+') && // Solo datos de 15+
           (item.sex === 'Male' || item.sex === 'Female') &&
           item.year >= 2000 && item.year <= 2024 // Rango más amplio para capturar más datos
         );
-      
+
       console.log('Datos PEA cargados:', data.length, 'registros');
       return data;
     } catch (error) {
@@ -138,10 +155,10 @@ const TimelineComparison = () => {
     try {
       const response = await fetch('/dataset/datos_sudamerica/salarios_promedio_mensuales_por_sexo_sudamerica.csv');
       if (!response.ok) throw new Error('Error al cargar datos de salarios');
-      
+
       const text = await response.text();
       const rows = parseCSV(text);
-      
+
       const data = rows
         .map(cols => ({
           country: normalizeCountryName(cols[0]?.replace(/"/g, '').trim()),
@@ -151,17 +168,17 @@ const TimelineComparison = () => {
           year: parseInt(cols[5]),
           salary: parseFloat(cols[6])
         }))
-        .filter(item => 
-          item.country && 
-          item.sex && 
-          item.currency && 
-          item.year && 
+        .filter(item =>
+          item.country &&
+          item.sex &&
+          item.currency &&
+          item.year &&
           !isNaN(item.salary) &&
           item.currency.includes('U.S. dollars') && // Solo datos en USD
           (item.sex === 'Male' || item.sex === 'Female') &&
           item.year >= 2000 && item.year <= 2024 // Rango más amplio para capturar más datos
         );
-      
+
       console.log('Datos salarios cargados:', data.length, 'registros');
       return data;
     } catch (error) {
@@ -174,55 +191,55 @@ const TimelineComparison = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      
+
       try {
         const [laborData, salaryDataResult] = await Promise.all([
           loadLaborForceData(),
           loadSalaryData()
         ]);
-        
+
         setLaborForceData(laborData);
         setSalaryData(salaryDataResult);
-        
+
         // Extraer países disponibles (solo los que tienen datos en ambos datasets)
         const laborCountries = [...new Set(laborData.map(item => item.country))].filter(Boolean);
         const salaryCountries = [...new Set(salaryDataResult.map(item => item.country))].filter(Boolean);
         const commonCountries = laborCountries.filter(country => salaryCountries.includes(country));
-        
+
         console.log('Países PEA encontrados:', laborCountries);
         console.log('Países salarios encontrados:', salaryCountries);
         console.log('Países comunes disponibles:', commonCountries);
         setAvailableCountries(commonCountries);
-        
+
         // Extraer años disponibles
         const laborYears = laborData.map(item => item.year).filter(year => !isNaN(year));
         const salaryYears = salaryDataResult.map(item => item.year).filter(year => !isNaN(year));
         const allYears = [...laborYears, ...salaryYears];
-        
+
         if (allYears.length > 0) {
           const minYear = Math.min(...allYears);
           const maxYear = Math.max(...allYears);
           setAvailableYears({ min: minYear, max: maxYear });
-          
+
           // Ajustar el rango de años seleccionado si es necesario
           setSelectedYearRange(prev => ({
             start: Math.max(prev.start, minYear),
             end: Math.min(prev.end, maxYear)
           }));
         }
-        
+
         // Seleccionar el primer país disponible si el actual no está disponible
         if (commonCountries.length > 0 && !commonCountries.includes(selectedCountry)) {
           setSelectedCountry(commonCountries[0]);
         }
-        
+
       } catch (error) {
         console.error('Error al cargar datos:', error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadData();
   }, []);
 
@@ -300,6 +317,25 @@ const TimelineComparison = () => {
     }
   };
 
+  // Construir array de años disponibles
+  const availableYearsArray = useMemo(() => {
+    return Array.from({ length: availableYears.max - availableYears.min + 1 }, (_, i) => availableYears.min + i);
+  }, [availableYears]);
+
+  // Estado para el slider
+  const sliderValues = [
+    availableYearsArray.indexOf(selectedYearRange.start),
+    availableYearsArray.indexOf(selectedYearRange.end)
+  ];
+
+  const handleSliderChange = (values) => {
+    const [startIdx, endIdx] = values;
+    setSelectedYearRange({
+      start: availableYearsArray[startIdx],
+      end: availableYearsArray[endIdx]
+    });
+  };
+
   // Procesar datos combinados
   const processedData = useMemo(() => {
     if (loading || laborForceData.length === 0 || salaryData.length === 0) {
@@ -307,9 +343,9 @@ const TimelineComparison = () => {
     }
 
     // Filtrar datos de PEA para el país y rango de años seleccionados
-    const filtered = laborForceData.filter(item => 
-      item.country === selectedCountry && 
-      item.year >= selectedYearRange.start && 
+    const filtered = laborForceData.filter(item =>
+      item.country === selectedCountry &&
+      item.year >= selectedYearRange.start &&
       item.year <= selectedYearRange.end
     );
 
@@ -319,12 +355,12 @@ const TimelineComparison = () => {
       if (!grouped[key]) {
         grouped[key] = { year: item.year };
       }
-      
+
       // Obtener población total estimada (buscar con múltiples nombres posibles)
-      const totalPopulation = populationData[item.country]?.[item.year] || 
-                             populationData[getDatasetCountryName(item.country)]?.[item.year] || 
-                             populationData[normalizeCountryName(item.country)]?.[item.year] || 0;
-      
+      const totalPopulation = populationData[item.country]?.[item.year] ||
+        populationData[getDatasetCountryName(item.country)]?.[item.year] ||
+        populationData[normalizeCountryName(item.country)]?.[item.year] || 0;
+
       // Calcular población económicamente activa en millones
       const activePop = (item.participationRate / 100) * totalPopulation;
       grouped[key][`activePop${item.sex}`] = activePop;
@@ -332,9 +368,9 @@ const TimelineComparison = () => {
     });
 
     // Agregar datos salariales
-    const salaryFiltered = salaryData.filter(item => 
-      item.country === selectedCountry && 
-      item.year >= selectedYearRange.start && 
+    const salaryFiltered = salaryData.filter(item =>
+      item.country === selectedCountry &&
+      item.year >= selectedYearRange.start &&
       item.year <= selectedYearRange.end
     );
 
@@ -589,64 +625,130 @@ const TimelineComparison = () => {
                 <div className="flex items-center gap-2">
                   <HiOutlineFilter className="w-5 h-5 text-gray-500" />
                   <label className="text-sm font-medium text-gray-700">País:</label>
-                  <select 
-                    value={selectedCountry} 
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    {availableCountries.map(country => (
-                      <option key={country} value={country}>{country}</option>
+                  {/* Nuevo diseño de selector de país */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {availableCountries.map(c => (
+                      <button
+                        key={c}
+                        type="button"
+                        className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
+                          ${selectedCountry === c
+                            ? "bg-[#e5e5e5] border-[#888] text-black"
+                            : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                        style={{
+                          backgroundColor: selectedCountry === c ? '#007bff' : '#fff',
+                          color: selectedCountry === c ? '#fff' : '#007bff',
+                          border: '1px solid #007bff',
+                          padding: '10px 20px',
+                          borderRadius: '8px',
+                          fontWeight: 'normal',
+                          fontSize: '16px',
+                          boxShadow: 'none',
+                          cursor: 'pointer',
+                          minWidth: 90,
+                          outline: 'none',
+                          margin: '8px 8px 8px 0',
+                        }}
+                        onClick={() => setSelectedCountry(c)}
+                      >
+                        <span className="truncate">{countryDisplayNames[c] || c}</span>
+                        {selectedCountry === c && (
+                          <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
+                            <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
+                            <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
+              </div>
 
-                {/* Selector de rango de años */}
-                <div className="flex items-center gap-2">
-                  <HiOutlineCalendar className="w-5 h-5 text-gray-500" />
-                  <label className="text-sm font-medium text-gray-700">Año inicio:</label>
-                  <select 
-                    value={selectedYearRange.start} 
-                    onChange={(e) => setSelectedYearRange({...selectedYearRange, start: parseInt(e.target.value)})}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                  <span className="text-gray-500">a</span>
-                  <select 
-                    value={selectedYearRange.end} 
-                    onChange={(e) => setSelectedYearRange({...selectedYearRange, end: parseInt(e.target.value)})}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
+              {/* Slider de intervalo de años */}
+              <div className="flex flex-col items-center w-full mt-4">
+                <label className="text-xs text-gray-500 mb-1">
+                  Rango de años:
+                </label>
+                <div className="flex items-center gap-2" style={{ width: 180 }}>
+                  <span className="text-xs text-blue-700 font-semibold">{selectedYearRange.start}</span>
+                  <Range
+                    step={1}
+                    min={0}
+                    max={availableYearsArray.length - 1}
+                    values={sliderValues}
+                    onChange={handleSliderChange}
+                    renderTrack={({ props, children }) => (
+                      <div
+                        {...props}
+                        style={{
+                          ...props.style,
+                          height: 4,
+                          width: '100%',
+                          background: 'linear-gradient(90deg,#e0e7ff 0%,#2563eb 100%)',
+                          borderRadius: 8,
+                        }}
+                      >{children}</div>
+                    )}
+                    renderThumb={({ props }) => (
+                      <div
+                        {...props}
+                        style={{
+                          ...props.style,
+                          height: 14,
+                          width: 14,
+                          backgroundColor: '#2563eb',
+                          borderRadius: '50%',
+                          border: '2px solid #fff',
+                        }}
+                      />
+                    )}
+                  />
+                  <span className="text-xs text-blue-700 font-semibold">{selectedYearRange.end}</span>
                 </div>
               </div>
 
               {/* Selector de métricas */}
-              <div className="flex flex-wrap items-center gap-2 mt-4">
+              <div className="flex items-center gap-2 mt-4">
+                <HiOutlineFilter className="w-5 h-5 text-gray-500" />
                 <label className="text-sm font-medium text-gray-700">Métricas:</label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {metricsConfig.slice(0, 8).map(metric => (
                     <button
                       key={metric.id}
+                      type="button"
+                      className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
+                        ${selectedMetrics.includes(metric.id)
+                          ? "bg-[#e5e5e5] border-[#888] text-black"
+                          : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                      style={{
+                        backgroundColor: selectedMetrics.includes(metric.id) ? '#007bff' : '#fff',
+                        color: selectedMetrics.includes(metric.id) ? '#fff' : '#007bff',
+                        border: '1px solid #007bff',
+                        padding: '10px 20px',
+                        borderRadius: '8px',
+                        fontWeight: 'normal',
+                        fontSize: '16px',
+                        boxShadow: 'none',
+                        cursor: 'pointer',
+                        minWidth: 90,
+                        outline: 'none',
+                        margin: '8px 8px 8px 0',
+                      }}
                       onClick={() => {
-                        setSelectedMetrics(prev => 
-                          prev.includes(metric.id) 
+                        setSelectedMetrics(prev =>
+                          prev.includes(metric.id)
                             ? prev.filter(id => id !== metric.id)
                             : [...prev, metric.id]
                         );
                       }}
-                      className={`px-3 py-1 text-xs rounded-full border transition-all duration-200 ${
-                        selectedMetrics.includes(metric.id)
-                          ? 'bg-blue-500 text-white border-blue-500'
-                          : 'bg-white text-gray-600 border-gray-300 hover:border-blue-500'
-                      }`}
                     >
-                      {metric.title}
+                      <span className="truncate">{metric.title}</span>
+                      {selectedMetrics.includes(metric.id) && (
+                        <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
+                          <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
+                          <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -664,31 +766,138 @@ const TimelineComparison = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => applyMetricsPreset('todas')}
-                  className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor: selectedMetrics.length === metricsConfig.length ? '#007bff' : '#fff',
+                    color: selectedMetrics.length === metricsConfig.length ? '#fff' : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Todas
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('principales')}
-                  className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.principales.length &&
+                      metricsPresets.principales.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.principales.length &&
+                      metricsPresets.principales.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Principales
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('genero')}
-                  className="px-3 py-1 text-xs bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.genero.length &&
+                      metricsPresets.genero.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.genero.length &&
+                      metricsPresets.genero.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Por Género
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('brechas')}
-                  className="px-3 py-1 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.brechas.length &&
+                      metricsPresets.brechas.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.brechas.length &&
+                      metricsPresets.brechas.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Brechas
                 </button>
                 <button
                   onClick={() => applyMetricsPreset('ratios')}
-                  className="px-3 py-1 text-xs bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      selectedMetrics.length === metricsPresets.ratios.length &&
+                      metricsPresets.ratios.every(id => selectedMetrics.includes(id))
+                        ? '#007bff'
+                        : '#fff',
+                    color:
+                      selectedMetrics.length === metricsPresets.ratios.length &&
+                      metricsPresets.ratios.every(id => selectedMetrics.includes(id))
+                        ? '#fff'
+                        : '#007bff',
+                    border: '1px solid #007bff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontWeight: 'normal',
+                    fontSize: '16px',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    minWidth: 90,
+                    outline: 'none',
+                    margin: '8px 8px 8px 0',
+                  }}
+                  className="transition-colors"
                 >
                   Ratios
                 </button>
@@ -698,7 +907,7 @@ const TimelineComparison = () => {
             {/* Métricas clave dinámicas */}
             <div className="stats-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
               {calculateMetrics.map((metric) => (
-                <StatCard 
+                <StatCard
                   key={metric.id}
                   title={metric.title}
                   value={metric.value}
@@ -720,30 +929,30 @@ const TimelineComparison = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={processedData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="year" 
-                      stroke="#666" 
+                    <XAxis
+                      dataKey="year"
+                      stroke="#666"
                       fontSize={12}
                     />
-                    <YAxis 
-                      stroke="#666" 
+                    <YAxis
+                      stroke="#666"
                       fontSize={12}
                       label={{ value: 'USD', angle: -90, position: 'insideLeft' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="salaryMale" 
-                      stroke="#10B981" 
+                    <Line
+                      type="monotone"
+                      dataKey="salaryMale"
+                      stroke="#10B981"
                       strokeWidth={3}
                       name="Salario Masculino"
                       dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="salaryFemale" 
-                      stroke="#F59E0B" 
+                    <Line
+                      type="monotone"
+                      dataKey="salaryFemale"
+                      stroke="#F59E0B"
                       strokeWidth={3}
                       name="Salario Femenino"
                       dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
@@ -760,54 +969,54 @@ const TimelineComparison = () => {
                 <ResponsiveContainer width="100%" height={400}>
                   <ComposedChart data={processedData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="year" 
-                      stroke="#666" 
+                    <XAxis
+                      dataKey="year"
+                      stroke="#666"
                       fontSize={12}
                     />
-                    <YAxis 
+                    <YAxis
                       yAxisId="left"
-                      stroke="#666" 
+                      stroke="#666"
                       fontSize={12}
                       label={{ value: 'Millones de personas', angle: -90, position: 'insideLeft' }}
                     />
-                    <YAxis 
+                    <YAxis
                       yAxisId="right"
                       orientation="right"
-                      stroke="#666" 
+                      stroke="#666"
                       fontSize={12}
                       label={{ value: 'USD', angle: 90, position: 'insideRight' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
-                    <Bar 
+                    <Bar
                       yAxisId="left"
-                      dataKey="activePopMale" 
-                      fill="#3B82F6" 
+                      dataKey="activePopMale"
+                      fill="#3B82F6"
                       name="PEA Masculina"
                       opacity={0.6}
                     />
-                    <Bar 
+                    <Bar
                       yAxisId="left"
-                      dataKey="activePopFemale" 
-                      fill="#EC4899" 
+                      dataKey="activePopFemale"
+                      fill="#EC4899"
                       name="PEA Femenina"
                       opacity={0.6}
                     />
-                    <Line 
+                    <Line
                       yAxisId="right"
-                      type="monotone" 
-                      dataKey="salaryMale" 
-                      stroke="#10B981" 
+                      type="monotone"
+                      dataKey="salaryMale"
+                      stroke="#10B981"
                       strokeWidth={3}
                       name="Salario Masculino"
                       dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
                     />
-                    <Line 
+                    <Line
                       yAxisId="right"
-                      type="monotone" 
-                      dataKey="salaryFemale" 
-                      stroke="#F59E0B" 
+                      type="monotone"
+                      dataKey="salaryFemale"
+                      stroke="#F59E0B"
                       strokeWidth={3}
                       name="Salario Femenino"
                       dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}

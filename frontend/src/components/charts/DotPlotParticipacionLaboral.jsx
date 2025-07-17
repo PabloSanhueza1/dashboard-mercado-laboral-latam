@@ -199,7 +199,6 @@ const DotPlotParticipacionLaboral = () => {
                             ))}
                         </div>
                     </div>
-                    {/* El slider se mueve debajo del gráfico */}
                 </div>
             </div>
             {/* Dot Chart */}
