@@ -92,9 +92,9 @@ const InformalityAnalysis = () => {
   }, [processedData, selectedYear]);
 
   return (
-    <div className="space-y-6">
+    <div className="chart-container">
       {/* Header y controles */}
-      <div className="bg-white rounded-lg p-6 shadow-sm border">
+      <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">
           Análisis de Informalidad Laboral por Sexo
         </h2>
@@ -212,9 +212,9 @@ const InformalityAnalysis = () => {
       {/* Gráficos principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Comparación por sexo */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border">
+        <div className="rounded-lg p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Informalidad por Sexo ({selectedYear})
+            Informalidad por Sexo
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={processedData}>
@@ -230,7 +230,7 @@ const InformalityAnalysis = () => {
         </div>
 
         {/* Brecha de género */}
-        <div className="bg-white rounded-lg p-6 shadow-sm border">
+        <div className="rounded-lg p-6 shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Brecha de Género en Informalidad
           </h3>

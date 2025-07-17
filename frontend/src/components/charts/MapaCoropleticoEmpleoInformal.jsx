@@ -353,72 +353,43 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       )}
 
       {/* Mapa con slider */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <Plot
-          data={plotData}
-          layout={layout}
-          config={config}
-          style={{ width: '100%', height: '500px' }}
-          useResizeHandler={true}
-          onUpdate={(figure, graphDiv) => {
-            // Detectar cambios en el slider y actualizar el estado
-            if (figure.layout && figure.layout.sliders && figure.layout.sliders[0]) {
-              const activeStep = figure.layout.sliders[0].active;
-              if (activeStep !== undefined && availableYears[activeStep]) {
-                const newYear = availableYears[activeStep];
-                if (newYear !== selectedYear) {
-                  setSelectedYear(newYear);
-                }
+      <Plot
+        data={plotData}
+        layout={layout}
+        config={config}
+        style={{ width: '100%', height: '500px' }}
+        useResizeHandler={true}
+        onUpdate={(figure, graphDiv) => {
+          // Detectar cambios en el slider y actualizar el estado
+          if (figure.layout && figure.layout.sliders && figure.layout.sliders[0]) {
+            const activeStep = figure.layout.sliders[0].active;
+            if (activeStep !== undefined && availableYears[activeStep]) {
+              const newYear = availableYears[activeStep];
+              if (newYear !== selectedYear) {
+                setSelectedYear(newYear);
               }
             }
-          }}
-          onSliderChange={(data) => {
-            if (data && data.slider && data.slider.value) {
-              setSelectedYear(parseInt(data.slider.value));
-            }
-          }}
-          onPlotlyRestyle={(data, graphDiv) => {
-            // Manejar cambios cuando se usa el slider
-            if (graphDiv && graphDiv.layout && graphDiv.layout.sliders && graphDiv.layout.sliders[0]) {
-              const activeStep = graphDiv.layout.sliders[0].active;
-              if (activeStep !== undefined && availableYears[activeStep]) {
-                const newYear = availableYears[activeStep];
-                if (newYear !== selectedYear) {
-                  setSelectedYear(newYear);
-                }
+          }
+        }}
+        onSliderChange={(data) => {
+          if (data && data.slider && data.slider.value) {
+            setSelectedYear(parseInt(data.slider.value));
+          }
+        }}
+        onPlotlyRestyle={(data, graphDiv) => {
+          // Manejar cambios cuando se usa el slider
+          if (graphDiv && graphDiv.layout && graphDiv.layout.sliders && graphDiv.layout.sliders[0]) {
+            const activeStep = graphDiv.layout.sliders[0].active;
+            if (activeStep !== undefined && availableYears[activeStep]) {
+              const newYear = availableYears[activeStep];
+              if (newYear !== selectedYear) {
+                setSelectedYear(newYear);
               }
             }
-          }}
-        />
-      </div>
+          }
+        }}
+      />
 
-      {/* Información adicional mejorada */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-        <div className="text-xs text-blue-800 space-y-2">
-          {/* Guía de interpretación */}
-          <div className="mt-4 p-3 bg-white rounded-lg border border-blue-300">
-            <h4 className="font-semibold text-blue-900 mb-3 text-sm">🎯 Guía de Interpretación</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-green-600 rounded"></div>
-                <span><strong>0-30%:</strong> Baja informalidad</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                <span><strong>30-50%:</strong> Moderada</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-orange-500 rounded"></div>
-                <span><strong>50-70%:</strong> Alta</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-red-600 rounded"></div>
-                <span><strong>70%+:</strong> Muy alta</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
