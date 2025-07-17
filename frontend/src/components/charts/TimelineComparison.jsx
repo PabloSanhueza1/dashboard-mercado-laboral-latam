@@ -19,6 +19,7 @@ const TimelineComparison = () => {
   const [loading, setLoading] = useState(true);
   const [availableCountries, setAvailableCountries] = useState([]);
   const [availableYears, setAvailableYears] = useState({ min: 2010, max: 2023 });
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   const countryDisplayNames = {
     'Argentina': 'Argentina',
@@ -1029,19 +1030,28 @@ const TimelineComparison = () => {
             {/* Panel de información */}
             <div className="bg-gray-50 p-6 rounded-lg mt-6">
               <div className="flex items-center gap-3 mb-4">
-                <HiOutlineInformationCircle className="w-6 h-6 text-blue-600" />
+                <button
+                  type="button"
+                  onClick={() => setShowInfoPanel((prev) => !prev)}
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                  aria-label="Mostrar información del análisis"
+                >
+                  <HiOutlineInformationCircle className="w-6 h-6 text-blue-600" />
+                </button>
                 <h3 className="text-lg font-600 text-gray-800">Información del Análisis</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                <div>
-                  <p><strong>Población Económicamente Activa (PEA):</strong> Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.</p>
-                  <p className="mt-2"><strong>Salarios en USD:</strong> Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.</p>
+              {showInfoPanel && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div>
+                    <p><strong>Población Económicamente Activa (PEA):</strong> Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.</p>
+                    <p className="mt-2"><strong>Salarios en USD:</strong> Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.</p>
+                  </div>
+                  <div>
+                    <p><strong>Brecha de PEA:</strong> Diferencia entre la tasa de participación laboral masculina y femenina, indicando disparidades en el acceso al mercado laboral.</p>
+                    <p className="mt-2"><strong>Brecha Salarial:</strong> Diferencia entre los salarios promedio de hombres y mujeres, reflejando desigualdades en la remuneración.</p>
+                  </div>
                 </div>
-                <div>
-                  <p><strong>Brecha de PEA:</strong> Diferencia entre la tasa de participación laboral masculina y femenina, indicando disparidades en el acceso al mercado laboral.</p>
-                  <p className="mt-2"><strong>Brecha Salarial:</strong> Diferencia entre los salarios promedio de hombres y mujeres, reflejando desigualdades en la remuneración.</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}
