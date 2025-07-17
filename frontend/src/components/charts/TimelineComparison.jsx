@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import {
   HiOutlineUsers, HiOutlineCurrencyDollar, HiOutlineFilter, HiOutlineCalendar,
-  HiOutlineInformationCircle, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineScale
+  HiOutlineInformationCircle, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineScale, HiChevronDown
 } from 'react-icons/hi';
 import { StatCard } from '../estadisticas/ResumenEstadisticas';
 import { Range } from 'react-range';
@@ -1028,27 +1028,89 @@ const TimelineComparison = () => {
             </div>
 
             {/* Panel de información */}
-            <div className="bg-gray-50 p-6 rounded-lg mt-6">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl mt-8 shadow-sm">
+              <div className="flex justify-center">
                 <button
                   type="button"
                   onClick={() => setShowInfoPanel((prev) => !prev)}
-                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                  className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-orange-200 rounded-lg hover:from-orange-100 hover:to-orange-200 hover:border-orange-300 transition-all duration-200 shadow-sm"
+                  style={{
+                    backgroundColor: '#fff5f0',
+                    borderColor: '#fed7aa',
+                    color: '#ea580c',
+                  }}
                   aria-label="Mostrar información del análisis"
                 >
-                  <HiOutlineInformationCircle className="w-6 h-6 text-blue-600" />
+                  <div className="p-2 bg-orange-100 rounded-full">
+                    <HiOutlineInformationCircle className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-orange-800">Información del Análisis</h3>
+                    <p className="text-sm text-orange-600 mt-1">
+                      {showInfoPanel ? 'Haz clic para ocultar conceptos y definiciones' : 'Haz clic para ver conceptos y definiciones'}
+                    </p>
+                  </div>
+                  <div className="text-orange-600">
+                    <HiChevronDown 
+                      className={`w-5 h-5 transition-transform duration-200 ${showInfoPanel ? 'rotate-180' : ''}`}
+                    />
+                  </div>
                 </button>
-                <h3 className="text-lg font-600 text-gray-800">Información del Análisis</h3>
               </div>
               {showInfoPanel && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div>
-                    <p><strong>Población Económicamente Activa (PEA):</strong> Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.</p>
-                    <p className="mt-2"><strong>Salarios en USD:</strong> Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.</p>
+                <div className="mt-6 p-6 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                        <div>
+                          <h4 className="font-semibold text-orange-800 mb-1">Población Económicamente Activa (PEA)</h4>
+                          <p className="text-orange-700">
+                            Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                        <div>
+                          <h4 className="font-semibold text-orange-800 mb-1">Salarios en USD</h4>
+                          <p className="text-orange-700">
+                            Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                        <div>
+                          <h4 className="font-semibold text-orange-800 mb-1">Brecha de PEA</h4>
+                          <p className="text-orange-700">
+                            Diferencia entre la tasa de participación laboral masculina y femenina, indicando disparidades en el acceso al mercado laboral.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                        <div>
+                          <h4 className="font-semibold text-orange-800 mb-1">Brecha Salarial</h4>
+                          <p className="text-orange-700">
+                            Diferencia entre los salarios promedio de hombres y mujeres, reflejando desigualdades en la remuneración.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p><strong>Brecha de PEA:</strong> Diferencia entre la tasa de participación laboral masculina y femenina, indicando disparidades en el acceso al mercado laboral.</p>
-                    <p className="mt-2"><strong>Brecha Salarial:</strong> Diferencia entre los salarios promedio de hombres y mujeres, reflejando desigualdades en la remuneración.</p>
+                  
+                  {/* Pie del panel con información adicional */}
+                  <div className="mt-6 pt-4 border-t border-orange-200">
+                    <div className="flex items-center justify-center gap-2 text-xs text-orange-600">
+                      <HiOutlineInformationCircle className="w-4 h-4" />
+                      <span>Los datos se actualizan según la selección de país y rango de años</span>
+                    </div>
                   </div>
                 </div>
               )}
