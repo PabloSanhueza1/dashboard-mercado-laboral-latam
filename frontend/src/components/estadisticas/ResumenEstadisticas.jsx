@@ -41,8 +41,6 @@ const ResumenEstadisticas = ({
   selectedCountries,
   datasetsWithIcons,
   activeDataset,
-  chartData,
-  selectedYearRange,
   summaryStats
 }) => {
   return (
