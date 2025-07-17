@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -543,7 +541,10 @@ const TimelineComparison = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg">
+        <div
+          className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg"
+          style={{ background: '#fff' }}
+        >
           <p className="font-semibold text-gray-800">{`Año: ${label}`}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }}>
