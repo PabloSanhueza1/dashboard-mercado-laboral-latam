@@ -153,9 +153,9 @@ const DotPlotParticipacionLaboral = () => {
         <div className="chart-container bg-white p-6 rounded-lg shadow-sm">
             {/* Título */}
             <div className="mb-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                <h2 className="text-lg font-semibold text-gray-900">
                     Tasa de participación laboral por grupo de edad y sexo ({countryDisplayNames[selectedCountry] || selectedCountry}, {selectedYear})
-                </h3>
+                </h2>
                 {/* Selectores de país y año */}
                 <div className="flex gap-4 mb-4 flex-wrap">
                     <div>

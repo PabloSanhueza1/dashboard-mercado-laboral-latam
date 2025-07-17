@@ -306,12 +306,9 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
       <div className="chart-header">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              🗺️ Mapa de Empleo Informal en Sudamérica
-            </h3>
-            <p className="text-sm text-gray-600 mt-1">
-              Visualización de las tasas de empleo informal por país
-            </p>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Mapa de empleo informal en sudamérica
+            </h2>
           </div>
         </div>
       </div>

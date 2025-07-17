@@ -607,7 +607,7 @@ const TimelineComparison = () => {
             {/* Título y descripción */}
             <div className="flex items-center gap-3 mb-6">
               <div>
-                <h2 className="text-2xl font-700 text-gray-800">
+                <h2 className="text-lg font-semibold text-gray-900">
                   Comparación temporal: PEA vs Salarios
                 </h2>
                 <p className="text-gray-600 mt-1">

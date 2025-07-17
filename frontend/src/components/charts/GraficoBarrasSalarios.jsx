@@ -95,9 +95,9 @@ const GraficoBarrasSalarios = () => {
       <div className="chart-header">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="chart-title">
-              💰 Salario Mínimo vs Ingreso Promedio 2025
-            </h3>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Salario mínimo vs Ingreso promedio 2025
+            </h2>
             <p className="text-sm text-gray-600 mt-1">
               Comparación de salarios mínimos e ingresos promedio en Sudamérica
             </p>
