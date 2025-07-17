@@ -470,12 +470,9 @@ const TimelineComparison = () => {
           <div className="bg-white bg-opacity-90 rounded-2xl border border-gray-200 shadow-lg p-6">
             {/* Título y descripción */}
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-16 text-white">
-                <HiOutlineUsers className="w-6 h-6" />
-              </div>
               <div>
                 <h2 className="text-2xl font-700 text-gray-800">
-                  Comparación Temporal: PEA vs Salarios
+                  Comparación temporal: PEA vs Salarios
                 </h2>
                 <p className="text-gray-600 mt-1">
                   Análisis de población económicamente activa (15+ años) y salarios promedio por sexo (2000-2024)
@@ -488,7 +485,6 @@ const TimelineComparison = () => {
               <div className="flex flex-wrap gap-4 items-center">
                 {/* Selector de país */}
                 <div className="flex items-center gap-2">
-                  <HiOutlineFilter className="w-5 h-5 text-gray-500" />
                   <label className="text-sm font-medium text-gray-700">País:</label>
                   {/* Nuevo diseño de selector de país */}
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -498,12 +494,12 @@ const TimelineComparison = () => {
                         type="button"
                         className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
                           ${selectedCountry === c
-                            ? "bg-[#e5e5e5] border-[#888] text-black"
-                            : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                            ? "bg-[#fde68a] border-[#ea580c] text-[#b45309]"
+                            : "bg-[#fff] border-[#fde68a] text-[#ea580c] hover:bg-[#fff7ed] hover:border-[#ea580c]"}`}
                         style={{
-                          backgroundColor: selectedCountry === c ? '#007bff' : '#fff',
-                          color: selectedCountry === c ? '#fff' : '#007bff',
-                          border: '1px solid #007bff',
+                          backgroundColor: selectedCountry === c ? '#fde68a' : '#fff',
+                          color: selectedCountry === c ? '#b45309' : '#ea580c',
+                          border: selectedCountry === c ? '2px solid #ea580c' : '1px solid #fde68a',
                           padding: '10px 20px',
                           borderRadius: '8px',
                           fontWeight: 'normal',
@@ -519,8 +515,8 @@ const TimelineComparison = () => {
                         <span className="truncate">{countryDisplayNames[c] || c}</span>
                         {selectedCountry === c && (
                           <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
-                            <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
-                            <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <circle cx="10" cy="10" r="7" fill="#fbbf24" opacity="0.7" />
+                            <path d="M7.5 10.5l2 2 3-3" stroke="#ea580c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
                       </button>
@@ -574,7 +570,6 @@ const TimelineComparison = () => {
 
               {/* Selector de métricas */}
               <div className="flex items-center gap-2 mt-4">
-                <HiOutlineFilter className="w-5 h-5 text-gray-500" />
                 <label className="text-sm font-medium text-gray-700">Métricas:</label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {metricsConfig.slice(0, 8).map(metric => (
@@ -583,12 +578,12 @@ const TimelineComparison = () => {
                       type="button"
                       className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
                         ${selectedMetrics.includes(metric.id)
-                          ? "bg-[#e5e5e5] border-[#888] text-black"
-                          : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                          ? "bg-[#fde68a] border-[#ea580c] text-[#b45309]"
+                          : "bg-[#fff] border-[#fde68a] text-[#ea580c] hover:bg-[#fff7ed] hover:border-[#ea580c]"}`}
                       style={{
-                        backgroundColor: selectedMetrics.includes(metric.id) ? '#007bff' : '#fff',
-                        color: selectedMetrics.includes(metric.id) ? '#fff' : '#007bff',
-                        border: '1px solid #007bff',
+                        backgroundColor: selectedMetrics.includes(metric.id) ? '#fde68a' : '#fff',
+                        color: selectedMetrics.includes(metric.id) ? '#b45309' : '#ea580c',
+                        border: selectedMetrics.includes(metric.id) ? '2px solid #ea580c' : '1px solid #fde68a',
                         padding: '10px 20px',
                         borderRadius: '8px',
                         fontWeight: 'normal',
@@ -604,8 +599,8 @@ const TimelineComparison = () => {
                       <span className="truncate">{metric.title}</span>
                       {selectedMetrics[0] === metric.id && (
                         <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
-                          <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
-                          <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="10" cy="10" r="7" fill="#fbbf24" opacity="0.7" />
+                          <path d="M7.5 10.5l2 2 3-3" stroke="#ea580c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}
                     </button>
@@ -617,7 +612,7 @@ const TimelineComparison = () => {
             {/* Selector de vista de métricas */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Métricas seleccionadas:</span>
+                <span className="text-sm font-medium text-gray-700">Métricas seleccionadas: </span>
                 <span className="text-sm text-gray-500">
                   {selectedMetrics.length} de {metricsConfig.length} disponibles
                 </span>
@@ -627,9 +622,9 @@ const TimelineComparison = () => {
                   onClick={() => applyMetricsPreset('todas')}
                   type="button"
                   style={{
-                    backgroundColor: selectedMetrics.length === metricsConfig.length ? '#007bff' : '#fff',
-                    color: selectedMetrics.length === metricsConfig.length ? '#fff' : '#007bff',
-                    border: '1px solid #007bff',
+                    backgroundColor: selectedMetrics.length === metricsConfig.length ? '#fde68a' : '#fff',
+                    color: selectedMetrics.length === metricsConfig.length ? '#b45309' : '#ea580c',
+                    border: selectedMetrics.length === metricsConfig.length ? '2px solid #ea580c' : '1px solid #fde68a',
                     padding: '10px 20px',
                     borderRadius: '8px',
                     fontWeight: 'normal',
@@ -651,14 +646,18 @@ const TimelineComparison = () => {
                     backgroundColor:
                       selectedMetrics.length === metricsPresets.principales.length &&
                         metricsPresets.principales.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
+                        ? '#fde68a'
                         : '#fff',
                     color:
                       selectedMetrics.length === metricsPresets.principales.length &&
                         metricsPresets.principales.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
+                        ? '#b45309'
+                        : '#ea580c',
+                    border:
+                      selectedMetrics.length === metricsPresets.principales.length &&
+                        metricsPresets.principales.every(id => selectedMetrics.includes(id))
+                        ? '2px solid #ea580c'
+                        : '1px solid #fde68a',
                     padding: '10px 20px',
                     borderRadius: '8px',
                     fontWeight: 'normal',
@@ -680,14 +679,18 @@ const TimelineComparison = () => {
                     backgroundColor:
                       selectedMetrics.length === metricsPresets.genero.length &&
                         metricsPresets.genero.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
+                        ? '#fde68a'
                         : '#fff',
                     color:
                       selectedMetrics.length === metricsPresets.genero.length &&
                         metricsPresets.genero.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
+                        ? '#b45309'
+                        : '#ea580c',
+                    border:
+                      selectedMetrics.length === metricsPresets.genero.length &&
+                        metricsPresets.genero.every(id => selectedMetrics.includes(id))
+                        ? '2px solid #ea580c'
+                        : '1px solid #fde68a',
                     padding: '10px 20px',
                     borderRadius: '8px',
                     fontWeight: 'normal',
@@ -698,7 +701,8 @@ const TimelineComparison = () => {
                     outline: 'none',
                     margin: '8px 8px 8px 0',
                   }}
-                  className="transition-colors"                >
+                  className="transition-colors"
+                >
                   Por Género
                 </button>
                 <button
@@ -708,14 +712,18 @@ const TimelineComparison = () => {
                     backgroundColor:
                       selectedMetrics.length === metricsPresets.brechas.length &&
                         metricsPresets.brechas.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
+                        ? '#fde68a'
                         : '#fff',
                     color:
                       selectedMetrics.length === metricsPresets.brechas.length &&
                         metricsPresets.brechas.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
+                        ? '#b45309'
+                        : '#ea580c',
+                    border:
+                      selectedMetrics.length === metricsPresets.brechas.length &&
+                        metricsPresets.brechas.every(id => selectedMetrics.includes(id))
+                        ? '2px solid #ea580c'
+                        : '1px solid #fde68a',
                     padding: '10px 20px',
                     borderRadius: '8px',
                     fontWeight: 'normal',
@@ -748,14 +756,49 @@ const TimelineComparison = () => {
 
             {/* Sección de Gráficos */}
             <div className="bg-gray-50 p-6 rounded-lg">
-              {/* Gráfico de salarios por sexo */}
+              {/* Panel superior: PEA por sexo */}
               <div className="mb-8">
                 <h3 className="text-lg font-600 text-gray-800 mb-4 flex items-center gap-2">
-                  <HiOutlineCurrencyDollar className="w-5 h-5 text-green-600" />
-                  Salarios Promedio por Sexo (USD)
+                  Tasa de participación laboral (PEA) por sexo (%)
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={processedData}>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={processedData} syncId="timelineSync">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis
+                      dataKey="year"
+                      stroke="#666"
+                      fontSize={12}
+                    />
+                    <YAxis
+                      stroke="#666"
+                      fontSize={12}
+                      label={{ value: 'PEA (%)', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    <Bar
+                      dataKey="participationRateMale"
+                      fill="#60a5fa"
+                      name="PEA Masculina (%)"
+                      opacity={0.7}
+                    />
+                    <Bar
+                      dataKey="participationRateFemale"
+                      fill="#a78bfa"
+                      name="PEA Femenina (%)"
+                      opacity={0.7}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Panel inferior: Salarios por sexo */}
+              <div>
+                <h3 className="text-lg font-600 text-gray-800 mb-4 flex items-center gap-2">
+                  Salarios promedio por sexo (USD)
+                </h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={processedData} syncId="timelineSync">
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis
                       dataKey="year"
@@ -772,84 +815,20 @@ const TimelineComparison = () => {
                     <Line
                       type="monotone"
                       dataKey="salaryMale"
-                      stroke="#10B981"
+                      stroke="#2563eb"
                       strokeWidth={3}
                       name="Salario Masculino"
-                      dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                      dot={{ fill: '#2563eb', strokeWidth: 2, r: 4 }}
                     />
                     <Line
                       type="monotone"
                       dataKey="salaryFemale"
-                      stroke="#F59E0B"
+                      stroke="#e11d48"
                       strokeWidth={3}
                       name="Salario Femenino"
-                      dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+                      dot={{ fill: '#e11d48', strokeWidth: 2, r: 4 }}
                     />
                   </LineChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Gráfico combinado */}
-              <div>
-                <h3 className="text-lg font-600 text-gray-800 mb-4">
-                  Análisis Combinado: PEA vs Salarios
-                </h3>
-                <ResponsiveContainer width="100%" height={400}>
-                  <ComposedChart data={processedData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      dataKey="year"
-                      stroke="#666"
-                      fontSize={12}
-                    />
-                    <YAxis
-                      yAxisId="left"
-                      stroke="#666"
-                      fontSize={12}
-                      label={{ value: 'Tasa de participación (%)', angle: -90, position: 'insideLeft' }}
-                    />
-                    <YAxis
-                      yAxisId="right"
-                      orientation="right"
-                      stroke="#666"
-                      fontSize={12}
-                      label={{ value: 'USD', angle: 90, position: 'insideRight' }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar
-                      yAxisId="left"
-                      dataKey="participationRateMale"
-                      fill="#3B82F6"
-                      name="PEA Masculina (%)"
-                      opacity={0.6}
-                    />
-                    <Bar
-                      yAxisId="left"
-                      dataKey="participationRateFemale"
-                      fill="#EC4899"
-                      name="PEA Femenina (%)"
-                      opacity={0.6}
-                    />
-                    <Line
-                      yAxisId="right"
-                      type="monotone"
-                      dataKey="salaryMale"
-                      stroke="#10B981"
-                      strokeWidth={3}
-                      name="Salario Masculino"
-                      dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-                    />
-                    <Line
-                      yAxisId="right"
-                      type="monotone"
-                      dataKey="salaryFemale"
-                      stroke="#F59E0B"
-                      strokeWidth={3}
-                      name="Salario Femenino"
-                      dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
-                    />
-                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
             </div>

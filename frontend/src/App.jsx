@@ -119,3 +119,11 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// Si agregas botones aquí, usa:
+// style={{
+//   backgroundColor: selected ? '#fde68a' : '#fff',
+//   color: selected ? '#b45309' : '#ea580c',
+//   border: selected ? '2px solid #ea580c' : '1px solid #fde68a',
+//   ...otros estilos
+// }}

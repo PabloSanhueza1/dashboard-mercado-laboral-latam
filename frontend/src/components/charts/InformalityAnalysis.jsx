@@ -96,7 +96,7 @@ const InformalityAnalysis = () => {
       {/* Header y controles */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Análisis de Informalidad Laboral por Sexo
+          Análisis de informalidad laboral por sexo
         </h2>
         <div className="flex flex-wrap gap-4 mb-4">
           <div>
@@ -114,13 +114,13 @@ const InformalityAnalysis = () => {
                     max={availableYears.length - 1}
                     value={availableYears.indexOf(selectedYear)}
                     onChange={e => setSelectedYear(availableYears[parseInt(e.target.value)])}
-                    className="w-full h-3 accent-blue-600"
+                    className="w-full h-3 accent-orange-500"
                     style={{
                       appearance: "none",
-                      background: "linear-gradient(90deg,#e0e7ff 0%,#2563eb 100%)",
+                      background: "linear-gradient(90deg,#fde68a 0%,#ea580c 100%)",
                       borderRadius: "999px",
                       outline: "none",
-                      boxShadow: "0 1px 4px rgba(37,99,235,0.10)",
+                      boxShadow: "0 1px 4px rgba(234,88,12,0.10)",
                     }}
                   />
                   <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
@@ -130,41 +130,41 @@ const InformalityAnalysis = () => {
                     appearance: none;
                     width: 18px;
                     height: 18px;
-                    background: #2563eb;
+                    background: #ea580c;
                     border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                    box-shadow: 0 2px 8px rgba(234,88,12,0.15);
                     border: 2px solid #fff;
                     cursor: pointer;
                     transition: background 0.2s;
                   }
                   input[type="range"]:focus::-webkit-slider-thumb {
-                    background: #1e40af;
+                    background: #b45309;
                   }
                   input[type="range"]::-moz-range-thumb {
                     width: 18px;
                     height: 18px;
-                    background: #2563eb;
+                    background: #ea580c;
                     border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                    box-shadow: 0 2px 8px rgba(234,88,12,0.15);
                     border: 2px solid #fff;
                     cursor: pointer;
                     transition: background 0.2s;
                   }
                   input[type="range"]:focus::-moz-range-thumb {
-                    background: #1e40af;
+                    background: #b45309;
                   }
                   input[type="range"]::-ms-thumb {
                     width: 18px;
                     height: 18px;
-                    background: #2563eb;
+                    background: #ea580c;
                     border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                    box-shadow: 0 2px 8px rgba(234,88,12,0.15);
                     border: 2px solid #fff;
                     cursor: pointer;
                     transition: background 0.2s;
                   }
                   input[type="range"]:focus::-ms-thumb {
-                    background: #1e40af;
+                    background: #b45309;
                   }
                 `}</style>
               </div>
@@ -220,7 +220,15 @@ const InformalityAnalysis = () => {
             <BarChart data={processedData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="country" />
-              <YAxis />
+              <YAxis
+                label={{
+                  value: 'Tasa de informalidad (%)',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: 0,
+                  dy: 100,
+                }}
+              />
               <Tooltip formatter={(value) => [`${value?.toFixed(1)}%`, 'Tasa de Informalidad']} />
               <Legend />
               <Bar dataKey="Male" fill="#3B82F6" name="Hombres" />
@@ -238,7 +246,15 @@ const InformalityAnalysis = () => {
             <BarChart data={genderGapData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="country" />
-              <YAxis />
+              <YAxis
+                label={{
+                  value: 'Diferencia (%)',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: 0,
+                  dy: 100,
+                }}
+              />
               <Tooltip formatter={(value) => [`${value?.toFixed(1)}%`, 'Diferencia']} />
               <Bar
                 dataKey="gap"

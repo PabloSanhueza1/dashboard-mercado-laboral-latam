@@ -154,11 +154,8 @@ const DotPlotParticipacionLaboral = () => {
             {/* Título */}
             <div className="mb-6">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    Tasa de Participación Laboral por Grupo de Edad y Sexo ({countryDisplayNames[selectedCountry] || selectedCountry}, {selectedYear})
+                    Tasa de participación laboral por grupo de edad y sexo ({countryDisplayNames[selectedCountry] || selectedCountry}, {selectedYear})
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                    Cada punto representa la tasa de participación laboral (%) para un grupo de edad y sexo.
-                </p>
                 {/* Selectores de país y año */}
                 <div className="flex gap-4 mb-4 flex-wrap">
                     <div>
@@ -170,12 +167,12 @@ const DotPlotParticipacionLaboral = () => {
                                     type="button"
                                     className={`px-4 py-1 rounded border text-sm flex items-center gap-1 transition-colors
                                         ${selectedCountry === c
-                                            ? "bg-[#e5e5e5] border-[#888] text-black"
-                                            : "bg-[#f5f5f5] border-[#bbb] text-black hover:bg-[#e0e0e0] hover:border-[#888]"}`}
+                                            ? "bg-[#fde68a] border-[#ea580c] text-[#b45309]"
+                                            : "bg-[#fff] border-[#fde68a] text-[#ea580c] hover:bg-[#fff7ed] hover:border-[#ea580c]"}`}
                                     style={{
-                                        backgroundColor: selectedCountry === c ? '#007bff' : '#fff', // azul si seleccionado, blanco si no
-                                        color: selectedCountry === c ? '#fff' : '#007bff',           // texto blanco si seleccionado, azul si no
-                                        border: '1px solid #007bff',                                 // borde azul en todos
+                                        backgroundColor: selectedCountry === c ? '#fde68a' : '#fff', // naranja claro si seleccionado, blanco si no
+                                        color: selectedCountry === c ? '#b45309' : '#ea580c',        // texto naranja oscuro si seleccionado, naranja si no
+                                        border: selectedCountry === c ? '2px solid #ea580c' : '1px solid #fde68a', // borde naranja si seleccionado, naranja claro si no
                                         padding: '10px 20px',
                                         borderRadius: '8px',
                                         fontWeight: 'normal',
@@ -191,8 +188,8 @@ const DotPlotParticipacionLaboral = () => {
                                     <span className="truncate">{countryDisplayNames[c] || c}</span>
                                     {selectedCountry === c && (
                                         <svg width="14" height="14" fill="none" viewBox="0 0 20 20" style={{ marginLeft: 2 }}>
-                                            <circle cx="10" cy="10" r="7" fill="#bcd4f6" opacity="0.7" />
-                                            <path d="M7.5 10.5l2 2 3-3" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                            <circle cx="10" cy="10" r="7" fill="#fbbf24" opacity="0.7" />
+                                            <path d="M7.5 10.5l2 2 3-3" stroke="#ea580c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                     )}
                                 </button>
@@ -203,48 +200,50 @@ const DotPlotParticipacionLaboral = () => {
             </div>
             {/* Dot Chart */}
             <div style={{ width: '100%', height: '400px', position: 'relative' }}>
-                {/* Leyenda dentro del gráfico */}
-                <div
-                    style={{
-                        position: "absolute",
-                        top: 16,
-                        right: 24,
-                        zIndex: 10,
-                        background: "rgba(255,255,255,0.95)",
-                        borderRadius: "8px",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                        padding: "8px 16px",
-                        display: "flex",
-                        gap: "18px",
-                        alignItems: "center",
-                        border: "1px solid #e5e7eb"
-                    }}
-                >
-                    <div className="flex items-center gap-2">
-                        <div
-                            style={{
-                                background: sexColors.Male,
-                                width: "18px",
-                                height: "18px",
-                                borderRadius: "50%",
-                                border: "2px solid #e5e7eb"
-                            }}
-                        ></div>
-                        <span className="text-xs text-gray-700">{sexDisplayNames['Male']}</span>
+                {/* Leyenda dentro del gráfico solo si hay datos */}
+                {filteredData.length > 0 && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: 16,
+                            right: 24,
+                            zIndex: 10,
+                            background: "rgba(255,255,255,0.95)",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                            padding: "8px 16px",
+                            display: "flex",
+                            gap: "18px",
+                            alignItems: "center",
+                            border: "1px solid #e5e7eb"
+                        }}
+                    >
+                        <div className="flex items-center gap-2">
+                            <div
+                                style={{
+                                    background: sexColors.Male,
+                                    width: "18px",
+                                    height: "18px",
+                                    borderRadius: "50%",
+                                    border: "2px solid #e5e7eb"
+                                }}
+                            ></div>
+                            <span className="text-xs text-gray-700">{sexDisplayNames['Male']}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div
+                                style={{
+                                    background: sexColors.Female,
+                                    width: "18px",
+                                    height: "18px",
+                                    borderRadius: "50%",
+                                    border: "2px solid #e5e7eb"
+                                }}
+                            ></div>
+                            <span className="text-xs text-gray-700">{sexDisplayNames['Female']}</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div
-                            style={{
-                                background: sexColors.Female,
-                                width: "18px",
-                                height: "18px",
-                                borderRadius: "50%",
-                                border: "2px solid #e5e7eb"
-                            }}
-                        ></div>
-                        <span className="text-xs text-gray-700">{sexDisplayNames['Female']}</span>
-                    </div>
-                </div>
+                )}
                 {filteredData.length === 0 ? (
                     <div
                         className="absolute inset-0"
@@ -255,7 +254,6 @@ const DotPlotParticipacionLaboral = () => {
                             width: "100%",
                             height: "100%",
                             minHeight: 300,
-                            background: "rgba(255,255,255,0.85)",
                             zIndex: 20
                         }}
                     >
@@ -263,12 +261,12 @@ const DotPlotParticipacionLaboral = () => {
                             className="font-bold"
                             style={{
                                 fontSize: "2.2rem",
-                                color: "#2563eb",
+                                color: "#ea5833",
                                 textShadow: "0 2px 8px rgba(0,0,0,0.08)",
                                 textAlign: "center"
                             }}
                         >
-                            No datos de {countryDisplayNames[selectedCountry] || selectedCountry} en {selectedYear}
+                            No hay datos de {countryDisplayNames[selectedCountry] || selectedCountry} en {selectedYear}
                         </span>
                     </div>
                 ) : (
@@ -329,13 +327,13 @@ const DotPlotParticipacionLaboral = () => {
                         max={availableYears.length - 1}
                         value={availableYears.indexOf(selectedYear)}
                         onChange={e => setSelectedYear(availableYears[parseInt(e.target.value)])}
-                        className="w-full h-3 accent-blue-600"
+                        className="w-full h-3 accent-orange-500"
                         style={{
                             appearance: "none",
-                            background: "linear-gradient(90deg,#e0e7ff 0%,#2563eb 100%)",
+                            background: "linear-gradient(90deg,#fde68a 0%,#ea580c 100%)",
                             borderRadius: "999px",
                             outline: "none",
-                            boxShadow: "0 1px 4px rgba(37,99,235,0.10)",
+                            boxShadow: "0 1px 4px rgba(234,88,12,0.10)",
                         }}
                     />
                     <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
@@ -345,41 +343,41 @@ const DotPlotParticipacionLaboral = () => {
                         appearance: none;
                         width: 18px;
                         height: 18px;
-                        background: #2563eb;
+                        background: #ea580c;
                         border-radius: 50%;
-                        box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                        box-shadow: 0 2px 8px rgba(234,88,12,0.15);
                         border: 2px solid #fff;
                         cursor: pointer;
                         transition: background 0.2s;
                     }
                     input[type="range"]:focus::-webkit-slider-thumb {
-                        background: #1e40af;
+                        background: #b45309;
                     }
                     input[type="range"]::-moz-range-thumb {
                         width: 18px;
                         height: 18px;
-                        background: #2563eb;
+                        background: #ea580c;
                         border-radius: 50%;
-                        box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                        box-shadow: 0 2px 8px rgba(234,88,12,0.15);
                         border: 2px solid #fff;
                         cursor: pointer;
                         transition: background 0.2s;
                     }
                     input[type="range"]:focus::-moz-range-thumb {
-                        background: #1e40af;
+                        background: #b45309;
                     }
                     input[type="range"]::-ms-thumb {
                         width: 18px;
                         height: 18px;
-                        background: #2563eb;
+                        background: #ea580c;
                         border-radius: 50%;
-                        box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+                        box-shadow: 0 2px 8px rgba(234,88,12,0.15);
                         border: 2px solid #fff;
                         cursor: pointer;
                         transition: background 0.2s;
                     }
                     input[type="range"]:focus::-ms-thumb {
-                        background: #1e40af;
+                        background: #b45309;
                     }
                 `}</style>
             </div>
