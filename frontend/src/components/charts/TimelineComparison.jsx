@@ -1023,7 +1023,7 @@ const TimelineComparison = () => {
                     <HiOutlineInformationCircle className="w-6 h-6 text-orange-600" />
                   </div>
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold text-orange-800">Información del Análisis</h3>
+                    <h3 className="text-lg font-semibold text-orange-800">Información del análisis</h3>
                     <p className="text-sm text-orange-600 mt-1">
                       {showInfoPanel ? 'Haz clic para ocultar conceptos y definiciones' : 'Haz clic para ver conceptos y definiciones'}
                     </p>
@@ -1045,16 +1045,6 @@ const TimelineComparison = () => {
                           <h4 className="font-semibold text-orange-800 mb-1">Población Económicamente Activa (PEA)</h4>
                           <p className="text-orange-700">
                             Comprende a todas las personas de 15 años y más que participan en la fuerza laboral, ya sea trabajando o buscando trabajo activamente.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3">
-                        <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                        <div>
-                          <h4 className="font-semibold text-orange-800 mb-1">Salarios en USD</h4>
-                          <p className="text-orange-700">
-                            Salarios promedio mensuales convertidos a dólares estadounidenses para facilitar la comparación entre países.
                           </p>
                         </div>
                       </div>
@@ -1083,13 +1073,6 @@ const TimelineComparison = () => {
                     </div>
                   </div>
                   
-                  {/* Pie del panel con información adicional */}
-                  <div className="mt-6 pt-4 border-t border-orange-200">
-                    <div className="flex items-center justify-center gap-2 text-xs text-orange-600">
-                      <HiOutlineInformationCircle className="w-4 h-4" />
-                      <span>Los datos se actualizan según la selección de país y rango de años</span>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
