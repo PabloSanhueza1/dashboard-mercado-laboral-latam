@@ -38,10 +38,12 @@ const InformalityAnalysis = () => {
     });
   }, []);
 
-  // Obtener años disponibles
+  // Obtener años disponibles (orden creciente)
   const availableYears = useMemo(() => {
     if (!csvData || csvData.length === 0) return [];
-    const years = [...new Set(csvData.map(row => row.time))].sort((a, b) => b - a);
+    const years = [...new Set(csvData.map(row => row.time))]
+      .filter(y => y && !isNaN(Number(y)))
+      .sort((a, b) => a - b);
     return years;
   }, [csvData]);
 
@@ -103,7 +105,8 @@ const InformalityAnalysis = () => {
               <div className="flex flex-col items-center w-full">
                 <label className="text-xs text-gray-500 mb-2">
                   Año: <span className="font-semibold text-blue-700">{selectedYear}</span>
-                </label>                <div className="flex items-center w-96 max-w-full">
+                </label>
+                <div className="flex items-center w-96 max-w-full">
                   <span className="text-xs text-gray-400 mr-2">{availableYears[0]}</span>
                   <input
                     type="range"
@@ -120,7 +123,7 @@ const InformalityAnalysis = () => {
                       boxShadow: "0 1px 4px rgba(37,99,235,0.10)",
                     }}
                   />
-                    <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
+                  <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
                 </div>
                 <style>{`
                   input[type="range"]::-webkit-slider-thumb {
