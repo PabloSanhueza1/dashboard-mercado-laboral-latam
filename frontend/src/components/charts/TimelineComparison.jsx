@@ -1,246 +1,257 @@
-import React, { useState, useMemo } from 'react';
+
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   ComposedChart, Bar, BarChart, ReferenceLine
 } from 'recharts';
-import { HiOutlineUsers, HiOutlineCurrencyDollar, HiOutlineFilter, HiOutlineCalendar, HiOutlineInformationCircle } from 'react-icons/hi';
+import { 
+  HiOutlineUsers, HiOutlineCurrencyDollar, HiOutlineFilter, HiOutlineCalendar, 
+  HiOutlineInformationCircle, HiOutlineTrendingUp, HiOutlineChartBar, HiOutlineScale
+} from 'react-icons/hi';
+import { StatCard } from '../estadisticas/ResumenEstadisticas';
 
 const TimelineComparison = () => {
   const [selectedCountry, setSelectedCountry] = useState('Argentina');
-  const [selectedYearRange, setSelectedYearRange] = useState({ start: 2015, end: 2024 });
-  const [viewType, setViewType] = useState('combined'); // combined, separate, comparison
+  const [selectedYearRange, setSelectedYearRange] = useState({ start: 2010, end: 2024 });
 
-  // Datos de población económicamente activa por sexo (15+ años) - simulados basados en el CSV
-  const laborForceData = [
-    // Argentina
-    { country: 'Argentina', year: 2024, sex: 'Male', participationRate: 71.955, totalPopulation: 45.5 },
-    { country: 'Argentina', year: 2024, sex: 'Female', participationRate: 53.702, totalPopulation: 45.5 },
-    { country: 'Argentina', year: 2023, sex: 'Male', participationRate: 72.223, totalPopulation: 45.3 },
-    { country: 'Argentina', year: 2023, sex: 'Female', participationRate: 53.163, totalPopulation: 45.3 },
-    { country: 'Argentina', year: 2022, sex: 'Male', participationRate: 71.8, totalPopulation: 45.0 },
-    { country: 'Argentina', year: 2022, sex: 'Female', participationRate: 52.9, totalPopulation: 45.0 },
-    { country: 'Argentina', year: 2021, sex: 'Male', participationRate: 71.2, totalPopulation: 44.8 },
-    { country: 'Argentina', year: 2021, sex: 'Female', participationRate: 52.1, totalPopulation: 44.8 },
-    { country: 'Argentina', year: 2020, sex: 'Male', participationRate: 70.8, totalPopulation: 44.5 },
-    { country: 'Argentina', year: 2020, sex: 'Female', participationRate: 51.8, totalPopulation: 44.5 },
-    { country: 'Argentina', year: 2019, sex: 'Male', participationRate: 71.5, totalPopulation: 44.3 },
-    { country: 'Argentina', year: 2019, sex: 'Female', participationRate: 52.4, totalPopulation: 44.3 },
-    { country: 'Argentina', year: 2018, sex: 'Male', participationRate: 71.2, totalPopulation: 44.0 },
-    { country: 'Argentina', year: 2018, sex: 'Female', participationRate: 52.0, totalPopulation: 44.0 },
-    { country: 'Argentina', year: 2017, sex: 'Male', participationRate: 70.9, totalPopulation: 43.8 },
-    { country: 'Argentina', year: 2017, sex: 'Female', participationRate: 51.7, totalPopulation: 43.8 },
-    { country: 'Argentina', year: 2016, sex: 'Male', participationRate: 70.6, totalPopulation: 43.5 },
-    { country: 'Argentina', year: 2016, sex: 'Female', participationRate: 51.3, totalPopulation: 43.5 },
-    { country: 'Argentina', year: 2015, sex: 'Male', participationRate: 70.3, totalPopulation: 43.3 },
-    { country: 'Argentina', year: 2015, sex: 'Female', participationRate: 51.0, totalPopulation: 43.3 },
+  const [laborForceData, setLaborForceData] = useState([]);
+  const [salaryData, setSalaryData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [availableCountries, setAvailableCountries] = useState([]);
+  const [availableYears, setAvailableYears] = useState({ min: 2010, max: 2024 });
 
-    // Brasil
-    { country: 'Brasil', year: 2024, sex: 'Male', participationRate: 73.2, totalPopulation: 215.3 },
-    { country: 'Brasil', year: 2024, sex: 'Female', participationRate: 54.8, totalPopulation: 215.3 },
-    { country: 'Brasil', year: 2023, sex: 'Male', participationRate: 72.9, totalPopulation: 214.3 },
-    { country: 'Brasil', year: 2023, sex: 'Female', participationRate: 54.5, totalPopulation: 214.3 },
-    { country: 'Brasil', year: 2022, sex: 'Male', participationRate: 72.6, totalPopulation: 213.2 },
-    { country: 'Brasil', year: 2022, sex: 'Female', participationRate: 54.2, totalPopulation: 213.2 },
-    { country: 'Brasil', year: 2021, sex: 'Male', participationRate: 72.3, totalPopulation: 212.1 },
-    { country: 'Brasil', year: 2021, sex: 'Female', participationRate: 53.9, totalPopulation: 212.1 },
-    { country: 'Brasil', year: 2020, sex: 'Male', participationRate: 71.8, totalPopulation: 211.0 },
-    { country: 'Brasil', year: 2020, sex: 'Female', participationRate: 53.4, totalPopulation: 211.0 },
-    { country: 'Brasil', year: 2019, sex: 'Male', participationRate: 71.5, totalPopulation: 209.5 },
-    { country: 'Brasil', year: 2019, sex: 'Female', participationRate: 53.1, totalPopulation: 209.5 },
-    { country: 'Brasil', year: 2018, sex: 'Male', participationRate: 71.2, totalPopulation: 208.5 },
-    { country: 'Brasil', year: 2018, sex: 'Female', participationRate: 52.8, totalPopulation: 208.5 },
-    { country: 'Brasil', year: 2017, sex: 'Male', participationRate: 70.9, totalPopulation: 207.7 },
-    { country: 'Brasil', year: 2017, sex: 'Female', participationRate: 52.5, totalPopulation: 207.7 },
-    { country: 'Brasil', year: 2016, sex: 'Male', participationRate: 70.6, totalPopulation: 206.8 },
-    { country: 'Brasil', year: 2016, sex: 'Female', participationRate: 52.2, totalPopulation: 206.8 },
-    { country: 'Brasil', year: 2015, sex: 'Male', participationRate: 70.3, totalPopulation: 205.9 },
-    { country: 'Brasil', year: 2015, sex: 'Female', participationRate: 51.9, totalPopulation: 205.9 },
+  // Función para normalizar nombres de países
+  const normalizeCountryName = (countryName) => {
+    const countryMap = {
+      'Brazil': 'Brasil',
+      'Brasil': 'Brasil',
+      'Peru': 'Perú',
+      'Perú': 'Perú'
+    };
+    return countryMap[countryName] || countryName;
+  };
 
-    // Chile
-    { country: 'Chile', year: 2024, sex: 'Male', participationRate: 74.8, totalPopulation: 19.5 },
-    { country: 'Chile', year: 2024, sex: 'Female', participationRate: 52.3, totalPopulation: 19.5 },
-    { country: 'Chile', year: 2023, sex: 'Male', participationRate: 74.5, totalPopulation: 19.4 },
-    { country: 'Chile', year: 2023, sex: 'Female', participationRate: 52.0, totalPopulation: 19.4 },
-    { country: 'Chile', year: 2022, sex: 'Male', participationRate: 74.2, totalPopulation: 19.3 },
-    { country: 'Chile', year: 2022, sex: 'Female', participationRate: 51.7, totalPopulation: 19.3 },
-    { country: 'Chile', year: 2021, sex: 'Male', participationRate: 73.9, totalPopulation: 19.2 },
-    { country: 'Chile', year: 2021, sex: 'Female', participationRate: 51.4, totalPopulation: 19.2 },
-    { country: 'Chile', year: 2020, sex: 'Male', participationRate: 73.4, totalPopulation: 19.1 },
-    { country: 'Chile', year: 2020, sex: 'Female', participationRate: 51.0, totalPopulation: 19.1 },
-    { country: 'Chile', year: 2019, sex: 'Male', participationRate: 73.1, totalPopulation: 19.0 },
-    { country: 'Chile', year: 2019, sex: 'Female', participationRate: 50.7, totalPopulation: 19.0 },
-    { country: 'Chile', year: 2018, sex: 'Male', participationRate: 72.8, totalPopulation: 18.9 },
-    { country: 'Chile', year: 2018, sex: 'Female', participationRate: 50.4, totalPopulation: 18.9 },
-    { country: 'Chile', year: 2017, sex: 'Male', participationRate: 72.5, totalPopulation: 18.8 },
-    { country: 'Chile', year: 2017, sex: 'Female', participationRate: 50.1, totalPopulation: 18.8 },
-    { country: 'Chile', year: 2016, sex: 'Male', participationRate: 72.2, totalPopulation: 18.7 },
-    { country: 'Chile', year: 2016, sex: 'Female', participationRate: 49.8, totalPopulation: 18.7 },
-    { country: 'Chile', year: 2015, sex: 'Male', participationRate: 71.9, totalPopulation: 18.6 },
-    { country: 'Chile', year: 2015, sex: 'Female', participationRate: 49.5, totalPopulation: 18.6 },
+  // Función para obtener el nombre del país en el dataset
+  const getDatasetCountryName = (countryName) => {
+    const reverseMap = {
+      'Brasil': 'Brazil',
+      'Perú': 'Peru'
+    };
+    return reverseMap[countryName] || countryName;
+  };
 
-    // Colombia
-    { country: 'Colombia', year: 2024, sex: 'Male', participationRate: 77.2, totalPopulation: 51.5 },
-    { country: 'Colombia', year: 2024, sex: 'Female', participationRate: 55.8, totalPopulation: 51.5 },
-    { country: 'Colombia', year: 2023, sex: 'Male', participationRate: 76.9, totalPopulation: 51.0 },
-    { country: 'Colombia', year: 2023, sex: 'Female', participationRate: 55.5, totalPopulation: 51.0 },
-    { country: 'Colombia', year: 2022, sex: 'Male', participationRate: 76.6, totalPopulation: 50.5 },
-    { country: 'Colombia', year: 2022, sex: 'Female', participationRate: 55.2, totalPopulation: 50.5 },
-    { country: 'Colombia', year: 2021, sex: 'Male', participationRate: 76.3, totalPopulation: 50.0 },
-    { country: 'Colombia', year: 2021, sex: 'Female', participationRate: 54.9, totalPopulation: 50.0 },
-    { country: 'Colombia', year: 2020, sex: 'Male', participationRate: 75.8, totalPopulation: 49.5 },
-    { country: 'Colombia', year: 2020, sex: 'Female', participationRate: 54.4, totalPopulation: 49.5 },
-    { country: 'Colombia', year: 2019, sex: 'Male', participationRate: 75.5, totalPopulation: 49.0 },
-    { country: 'Colombia', year: 2019, sex: 'Female', participationRate: 54.1, totalPopulation: 49.0 },
-    { country: 'Colombia', year: 2018, sex: 'Male', participationRate: 75.2, totalPopulation: 48.5 },
-    { country: 'Colombia', year: 2018, sex: 'Female', participationRate: 53.8, totalPopulation: 48.5 },
-    { country: 'Colombia', year: 2017, sex: 'Male', participationRate: 74.9, totalPopulation: 48.0 },
-    { country: 'Colombia', year: 2017, sex: 'Female', participationRate: 53.5, totalPopulation: 48.0 },
-    { country: 'Colombia', year: 2016, sex: 'Male', participationRate: 74.6, totalPopulation: 47.5 },
-    { country: 'Colombia', year: 2016, sex: 'Female', participationRate: 53.2, totalPopulation: 47.5 },
-    { country: 'Colombia', year: 2015, sex: 'Male', participationRate: 74.3, totalPopulation: 47.0 },
-    { country: 'Colombia', year: 2015, sex: 'Female', participationRate: 52.9, totalPopulation: 47.0 },
+  // Función para parsear CSV correctamente
+  const parseCSV = (text) => {
+    const lines = text.split('\n');
+    const result = [];
+    
+    for (let i = 1; i < lines.length; i++) { // Skip header
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      const cols = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let j = 0; j < line.length; j++) {
+        const char = line[j];
+        
+        if (char === '"' && (j === 0 || line[j-1] === ',')) {
+          inQuotes = true;
+        } else if (char === '"' && inQuotes && (j === line.length - 1 || line[j+1] === ',')) {
+          inQuotes = false;
+        } else if (char === ',' && !inQuotes) {
+          cols.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      cols.push(current.trim());
+      
+      result.push(cols);
+    }
+    
+    return result;
+  };
 
-    // Perú
-    { country: 'Perú', year: 2024, sex: 'Male', participationRate: 79.8, totalPopulation: 33.0 },
-    { country: 'Perú', year: 2024, sex: 'Female', participationRate: 58.9, totalPopulation: 33.0 },
-    { country: 'Perú', year: 2023, sex: 'Male', participationRate: 79.5, totalPopulation: 32.8 },
-    { country: 'Perú', year: 2023, sex: 'Female', participationRate: 58.6, totalPopulation: 32.8 },
-    { country: 'Perú', year: 2022, sex: 'Male', participationRate: 79.2, totalPopulation: 32.6 },
-    { country: 'Perú', year: 2022, sex: 'Female', participationRate: 58.3, totalPopulation: 32.6 },
-    { country: 'Perú', year: 2021, sex: 'Male', participationRate: 78.9, totalPopulation: 32.4 },
-    { country: 'Perú', year: 2021, sex: 'Female', participationRate: 58.0, totalPopulation: 32.4 },
-    { country: 'Perú', year: 2020, sex: 'Male', participationRate: 78.4, totalPopulation: 32.2 },
-    { country: 'Perú', year: 2020, sex: 'Female', participationRate: 57.5, totalPopulation: 32.2 },
-    { country: 'Perú', year: 2019, sex: 'Male', participationRate: 78.1, totalPopulation: 32.0 },
-    { country: 'Perú', year: 2019, sex: 'Female', participationRate: 57.2, totalPopulation: 32.0 },
-    { country: 'Perú', year: 2018, sex: 'Male', participationRate: 77.8, totalPopulation: 31.8 },
-    { country: 'Perú', year: 2018, sex: 'Female', participationRate: 56.9, totalPopulation: 31.8 },
-    { country: 'Perú', year: 2017, sex: 'Male', participationRate: 77.5, totalPopulation: 31.6 },
-    { country: 'Perú', year: 2017, sex: 'Female', participationRate: 56.6, totalPopulation: 31.6 },
-    { country: 'Perú', year: 2016, sex: 'Male', participationRate: 77.2, totalPopulation: 31.4 },
-    { country: 'Perú', year: 2016, sex: 'Female', participationRate: 56.3, totalPopulation: 31.4 },
-    { country: 'Perú', year: 2015, sex: 'Male', participationRate: 76.9, totalPopulation: 31.2 },
-    { country: 'Perú', year: 2015, sex: 'Female', participationRate: 56.0, totalPopulation: 31.2 },
-  ];
+  // Función para cargar datos de PEA desde CSV
+  const loadLaborForceData = async () => {
+    try {
+      const response = await fetch('/dataset/datos_sudamerica/poblacion_economicamente_activa_por_sexo_edad_sudamerica.csv');
+      if (!response.ok) throw new Error('Error al cargar datos de PEA');
+      
+      const text = await response.text();
+      const rows = parseCSV(text);
+      
+      const data = rows
+        .map(cols => ({
+          country: normalizeCountryName(cols[0]?.replace(/"/g, '').trim()),
+          indicator: cols[2]?.replace(/"/g, '').trim(),
+          sex: cols[3]?.replace(/"/g, '').trim(),
+          ageGroup: cols[4]?.replace(/"/g, '').trim(),
+          year: parseInt(cols[5]),
+          participationRate: parseFloat(cols[6])
+        }))
+        .filter(item => 
+          item.country && 
+          item.sex && 
+          item.ageGroup && 
+          item.year && 
+          !isNaN(item.participationRate) &&
+          item.ageGroup.includes('15+') && // Solo datos de 15+
+          (item.sex === 'Male' || item.sex === 'Female') &&
+          item.year >= 2010 && item.year <= 2024 // Expandir rango de años
+        );
+      
+      console.log('Datos PEA cargados:', data.length, 'registros');
+      return data;
+    } catch (error) {
+      console.error('Error loading labor force data:', error);
+      return [];
+    }
+  };
 
-  // Datos de salarios promedio por sexo en USD - basados en el CSV
-  const salaryData = [
-    // Argentina
-    { country: 'Argentina', year: 2024, sex: 'Male', salary: 741.787 },
-    { country: 'Argentina', year: 2024, sex: 'Female', salary: 542.484 },
-    { country: 'Argentina', year: 2023, sex: 'Male', salary: 724.819 },
-    { country: 'Argentina', year: 2023, sex: 'Female', salary: 551.941 },
-    { country: 'Argentina', year: 2022, sex: 'Male', salary: 719.613 },
-    { country: 'Argentina', year: 2022, sex: 'Female', salary: 539.614 },
-    { country: 'Argentina', year: 2021, sex: 'Male', salary: 617.21 },
-    { country: 'Argentina', year: 2021, sex: 'Female', salary: 460.645 },
-    { country: 'Argentina', year: 2020, sex: 'Male', salary: 573.565 },
-    { country: 'Argentina', year: 2020, sex: 'Female', salary: 445.541 },
-    { country: 'Argentina', year: 2019, sex: 'Male', salary: 596.64 },
-    { country: 'Argentina', year: 2019, sex: 'Female', salary: 454.052 },
-    { country: 'Argentina', year: 2018, sex: 'Male', salary: 745.248 },
-    { country: 'Argentina', year: 2018, sex: 'Female', salary: 554.543 },
-    { country: 'Argentina', year: 2017, sex: 'Male', salary: 989.15 },
-    { country: 'Argentina', year: 2017, sex: 'Female', salary: 740.121 },
-    { country: 'Argentina', year: 2016, sex: 'Male', salary: 950.0 },
-    { country: 'Argentina', year: 2016, sex: 'Female', salary: 720.0 },
-    { country: 'Argentina', year: 2015, sex: 'Male', salary: 920.0 },
-    { country: 'Argentina', year: 2015, sex: 'Female', salary: 700.0 },
+  // Función para cargar datos de salarios desde CSV
+  const loadSalaryData = async () => {
+    try {
+      const response = await fetch('/dataset/datos_sudamerica/salarios_promedio_mensuales_por_sexo_sudamerica.csv');
+      if (!response.ok) throw new Error('Error al cargar datos de salarios');
+      
+      const text = await response.text();
+      const rows = parseCSV(text);
+      
+      const data = rows
+        .map(cols => ({
+          country: normalizeCountryName(cols[0]?.replace(/"/g, '').trim()),
+          indicator: cols[2]?.replace(/"/g, '').trim(),
+          sex: cols[3]?.replace(/"/g, '').trim(),
+          currency: cols[4]?.replace(/"/g, '').trim(),
+          year: parseInt(cols[5]),
+          salary: parseFloat(cols[6])
+        }))
+        .filter(item => 
+          item.country && 
+          item.sex && 
+          item.currency && 
+          item.year && 
+          !isNaN(item.salary) &&
+          item.currency.includes('U.S. dollars') && // Solo datos en USD
+          (item.sex === 'Male' || item.sex === 'Female') &&
+          item.year >= 2010 && item.year <= 2024 // Expandir rango de años
+        );
+      
+      console.log('Datos salarios cargados:', data.length, 'registros');
+      return data;
+    } catch (error) {
+      console.error('Error loading salary data:', error);
+      return [];
+    }
+  };
 
-    // Brasil
-    { country: 'Brasil', year: 2024, sex: 'Male', salary: 520.0 },
-    { country: 'Brasil', year: 2024, sex: 'Female', salary: 450.0 },
-    { country: 'Brasil', year: 2023, sex: 'Male', salary: 510.0 },
-    { country: 'Brasil', year: 2023, sex: 'Female', salary: 440.0 },
-    { country: 'Brasil', year: 2022, sex: 'Male', salary: 500.0 },
-    { country: 'Brasil', year: 2022, sex: 'Female', salary: 430.0 },
-    { country: 'Brasil', year: 2021, sex: 'Male', salary: 490.0 },
-    { country: 'Brasil', year: 2021, sex: 'Female', salary: 420.0 },
-    { country: 'Brasil', year: 2020, sex: 'Male', salary: 480.0 },
-    { country: 'Brasil', year: 2020, sex: 'Female', salary: 410.0 },
-    { country: 'Brasil', year: 2019, sex: 'Male', salary: 470.0 },
-    { country: 'Brasil', year: 2019, sex: 'Female', salary: 400.0 },
-    { country: 'Brasil', year: 2018, sex: 'Male', salary: 460.0 },
-    { country: 'Brasil', year: 2018, sex: 'Female', salary: 390.0 },
-    { country: 'Brasil', year: 2017, sex: 'Male', salary: 450.0 },
-    { country: 'Brasil', year: 2017, sex: 'Female', salary: 380.0 },
-    { country: 'Brasil', year: 2016, sex: 'Male', salary: 440.0 },
-    { country: 'Brasil', year: 2016, sex: 'Female', salary: 370.0 },
-    { country: 'Brasil', year: 2015, sex: 'Male', salary: 430.0 },
-    { country: 'Brasil', year: 2015, sex: 'Female', salary: 360.0 },
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      
+      try {
+        const [laborData, salaryDataResult] = await Promise.all([
+          loadLaborForceData(),
+          loadSalaryData()
+        ]);
+        
+        setLaborForceData(laborData);
+        setSalaryData(salaryDataResult);
+        
+        // Extraer países disponibles (solo los que tienen datos en ambos datasets)
+        const laborCountries = [...new Set(laborData.map(item => item.country))].filter(Boolean);
+        const salaryCountries = [...new Set(salaryDataResult.map(item => item.country))].filter(Boolean);
+        const commonCountries = laborCountries.filter(country => salaryCountries.includes(country));
+        
+        console.log('Países PEA encontrados:', laborCountries);
+        console.log('Países salarios encontrados:', salaryCountries);
+        console.log('Países comunes disponibles:', commonCountries);
+        setAvailableCountries(commonCountries);
+        
+        // Extraer años disponibles
+        const laborYears = laborData.map(item => item.year).filter(year => !isNaN(year));
+        const salaryYears = salaryDataResult.map(item => item.year).filter(year => !isNaN(year));
+        const allYears = [...laborYears, ...salaryYears];
+        
+        if (allYears.length > 0) {
+          const minYear = Math.min(...allYears);
+          const maxYear = Math.max(...allYears);
+          setAvailableYears({ min: minYear, max: maxYear });
+          
+          // Ajustar el rango de años seleccionado si es necesario
+          setSelectedYearRange(prev => ({
+            start: Math.max(prev.start, minYear),
+            end: Math.min(prev.end, maxYear)
+          }));
+        }
+        
+        // Seleccionar el primer país disponible si el actual no está disponible
+        if (commonCountries.length > 0 && !commonCountries.includes(selectedCountry)) {
+          setSelectedCountry(commonCountries[0]);
+        }
+        
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
 
-    // Chile
-    { country: 'Chile', year: 2024, sex: 'Male', salary: 720.0 },
-    { country: 'Chile', year: 2024, sex: 'Female', salary: 620.0 },
-    { country: 'Chile', year: 2023, sex: 'Male', salary: 710.0 },
-    { country: 'Chile', year: 2023, sex: 'Female', salary: 610.0 },
-    { country: 'Chile', year: 2022, sex: 'Male', salary: 700.0 },
-    { country: 'Chile', year: 2022, sex: 'Female', salary: 600.0 },
-    { country: 'Chile', year: 2021, sex: 'Male', salary: 690.0 },
-    { country: 'Chile', year: 2021, sex: 'Female', salary: 590.0 },
-    { country: 'Chile', year: 2020, sex: 'Male', salary: 680.0 },
-    { country: 'Chile', year: 2020, sex: 'Female', salary: 580.0 },
-    { country: 'Chile', year: 2019, sex: 'Male', salary: 670.0 },
-    { country: 'Chile', year: 2019, sex: 'Female', salary: 570.0 },
-    { country: 'Chile', year: 2018, sex: 'Male', salary: 660.0 },
-    { country: 'Chile', year: 2018, sex: 'Female', salary: 560.0 },
-    { country: 'Chile', year: 2017, sex: 'Male', salary: 650.0 },
-    { country: 'Chile', year: 2017, sex: 'Female', salary: 550.0 },
-    { country: 'Chile', year: 2016, sex: 'Male', salary: 640.0 },
-    { country: 'Chile', year: 2016, sex: 'Female', salary: 540.0 },
-    { country: 'Chile', year: 2015, sex: 'Male', salary: 630.0 },
-    { country: 'Chile', year: 2015, sex: 'Female', salary: 530.0 },
-
-    // Colombia
-    { country: 'Colombia', year: 2024, sex: 'Male', salary: 420.0 },
-    { country: 'Colombia', year: 2024, sex: 'Female', salary: 380.0 },
-    { country: 'Colombia', year: 2023, sex: 'Male', salary: 410.0 },
-    { country: 'Colombia', year: 2023, sex: 'Female', salary: 370.0 },
-    { country: 'Colombia', year: 2022, sex: 'Male', salary: 400.0 },
-    { country: 'Colombia', year: 2022, sex: 'Female', salary: 360.0 },
-    { country: 'Colombia', year: 2021, sex: 'Male', salary: 390.0 },
-    { country: 'Colombia', year: 2021, sex: 'Female', salary: 350.0 },
-    { country: 'Colombia', year: 2020, sex: 'Male', salary: 380.0 },
-    { country: 'Colombia', year: 2020, sex: 'Female', salary: 340.0 },
-    { country: 'Colombia', year: 2019, sex: 'Male', salary: 370.0 },
-    { country: 'Colombia', year: 2019, sex: 'Female', salary: 330.0 },
-    { country: 'Colombia', year: 2018, sex: 'Male', salary: 360.0 },
-    { country: 'Colombia', year: 2018, sex: 'Female', salary: 320.0 },
-    { country: 'Colombia', year: 2017, sex: 'Male', salary: 350.0 },
-    { country: 'Colombia', year: 2017, sex: 'Female', salary: 310.0 },
-    { country: 'Colombia', year: 2016, sex: 'Male', salary: 340.0 },
-    { country: 'Colombia', year: 2016, sex: 'Female', salary: 300.0 },
-    { country: 'Colombia', year: 2015, sex: 'Male', salary: 330.0 },
-    { country: 'Colombia', year: 2015, sex: 'Female', salary: 290.0 },
-
-    // Perú
-    { country: 'Perú', year: 2024, sex: 'Male', salary: 380.0 },
-    { country: 'Perú', year: 2024, sex: 'Female', salary: 340.0 },
-    { country: 'Perú', year: 2023, sex: 'Male', salary: 370.0 },
-    { country: 'Perú', year: 2023, sex: 'Female', salary: 330.0 },
-    { country: 'Perú', year: 2022, sex: 'Male', salary: 360.0 },
-    { country: 'Perú', year: 2022, sex: 'Female', salary: 320.0 },
-    { country: 'Perú', year: 2021, sex: 'Male', salary: 350.0 },
-    { country: 'Perú', year: 2021, sex: 'Female', salary: 310.0 },
-    { country: 'Perú', year: 2020, sex: 'Male', salary: 340.0 },
-    { country: 'Perú', year: 2020, sex: 'Female', salary: 300.0 },
-    { country: 'Perú', year: 2019, sex: 'Male', salary: 330.0 },
-    { country: 'Perú', year: 2019, sex: 'Female', salary: 290.0 },
-    { country: 'Perú', year: 2018, sex: 'Male', salary: 320.0 },
-    { country: 'Perú', year: 2018, sex: 'Female', salary: 280.0 },
-    { country: 'Perú', year: 2017, sex: 'Male', salary: 310.0 },
-    { country: 'Perú', year: 2017, sex: 'Female', salary: 270.0 },
-    { country: 'Perú', year: 2016, sex: 'Male', salary: 300.0 },
-    { country: 'Perú', year: 2016, sex: 'Female', salary: 260.0 },
-    { country: 'Perú', year: 2015, sex: 'Male', salary: 290.0 },
-    { country: 'Perú', year: 2015, sex: 'Female', salary: 250.0 },
-  ];
-
-  // Países disponibles
-  const availableCountries = ['Argentina', 'Brasil', 'Chile', 'Colombia', 'Perú'];
+  // Datos de población total estimada (para calcular PEA absoluta)
+  const populationData = {
+    'Argentina': {
+      2010: 40.4, 2011: 40.8, 2012: 41.3, 2013: 41.7, 2014: 42.1,
+      2015: 43.3, 2016: 43.5, 2017: 43.8, 2018: 44.0, 2019: 44.3,
+      2020: 44.5, 2021: 44.8, 2022: 45.0, 2023: 45.3, 2024: 45.5
+    },
+    'Brazil': {
+      2010: 195.5, 2011: 197.4, 2012: 199.2, 2013: 201.0, 2014: 202.8,
+      2015: 205.9, 2016: 206.8, 2017: 207.7, 2018: 208.5, 2019: 209.5,
+      2020: 211.0, 2021: 212.1, 2022: 213.2, 2023: 214.3, 2024: 215.3
+    },
+    'Brasil': {
+      2010: 195.5, 2011: 197.4, 2012: 199.2, 2013: 201.0, 2014: 202.8,
+      2015: 205.9, 2016: 206.8, 2017: 207.7, 2018: 208.5, 2019: 209.5,
+      2020: 211.0, 2021: 212.1, 2022: 213.2, 2023: 214.3, 2024: 215.3
+    },
+    'Chile': {
+      2010: 17.1, 2011: 17.3, 2012: 17.5, 2013: 17.6, 2014: 17.8,
+      2015: 18.6, 2016: 18.7, 2017: 18.8, 2018: 18.9, 2019: 19.0,
+      2020: 19.1, 2021: 19.2, 2022: 19.3, 2023: 19.4, 2024: 19.5
+    },
+    'Colombia': {
+      2010: 45.5, 2011: 46.0, 2012: 46.4, 2013: 46.8, 2014: 47.2,
+      2015: 47.0, 2016: 47.5, 2017: 48.0, 2018: 48.5, 2019: 49.0,
+      2020: 49.5, 2021: 50.0, 2022: 50.5, 2023: 51.0, 2024: 51.5
+    },
+    'Peru': {
+      2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
+      2015: 31.2, 2016: 31.4, 2017: 31.6, 2018: 31.8, 2019: 32.0,
+      2020: 32.2, 2021: 32.4, 2022: 32.6, 2023: 32.8, 2024: 33.0
+    },
+    'Perú': {
+      2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
+      2015: 31.2, 2016: 31.4, 2017: 31.6, 2018: 31.8, 2019: 32.0,
+      2020: 32.2, 2021: 32.4, 2022: 32.6, 2023: 32.8, 2024: 33.0
+    }
+  };
 
   // Procesar datos combinados
   const processedData = useMemo(() => {
+    if (loading || laborForceData.length === 0 || salaryData.length === 0) {
+      return [];
+    }
+
+    // Filtrar datos de PEA para el país y rango de años seleccionados
     const filtered = laborForceData.filter(item => 
       item.country === selectedCountry && 
       item.year >= selectedYearRange.start && 
@@ -254,8 +265,12 @@ const TimelineComparison = () => {
         grouped[key] = { year: item.year };
       }
       
+      // Obtener población total estimada (buscar con ambos nombres)
+      const totalPopulation = populationData[item.country]?.[item.year] || 
+                             populationData[getDatasetCountryName(item.country)]?.[item.year] || 0;
+      
       // Calcular población económicamente activa en millones
-      const activePop = (item.participationRate / 100) * item.totalPopulation;
+      const activePop = (item.participationRate / 100) * totalPopulation;
       grouped[key][`activePop${item.sex}`] = activePop;
       grouped[key][`participationRate${item.sex}`] = item.participationRate;
     });
@@ -274,8 +289,197 @@ const TimelineComparison = () => {
       }
     });
 
-    return Object.values(grouped).sort((a, b) => a.year - b.year);
-  }, [selectedCountry, selectedYearRange, laborForceData, salaryData]);
+    return Object.values(grouped)
+      .filter(item => item.activePopMale !== undefined && item.activePopFemale !== undefined)
+      .sort((a, b) => a.year - b.year);
+  }, [selectedCountry, selectedYearRange, laborForceData, salaryData, loading]);
+
+  // Configuración de métricas disponibles
+  const metricsConfig = [
+    {
+      id: 'totalPEA',
+      title: 'PEA Total Actual',
+      icon: HiOutlineUsers,
+      color: 'blue',
+      formatter: (value) => `${value.toFixed(1)}M`,
+      calculate: (latest, first) => ({
+        value: (latest?.activePopMale || 0) + (latest?.activePopFemale || 0),
+        firstValue: (first?.activePopMale || 0) + (first?.activePopFemale || 0)
+      })
+    },
+    {
+      id: 'avgSalary',
+      title: 'Salario Promedio',
+      icon: HiOutlineCurrencyDollar,
+      color: 'green',
+      formatter: (value) => `$${value.toFixed(0)}`,
+      calculate: (latest, first) => ({
+        value: ((latest?.salaryMale || 0) + (latest?.salaryFemale || 0)) / 2,
+        firstValue: ((first?.salaryMale || 0) + (first?.salaryFemale || 0)) / 2
+      })
+    },
+    {
+      id: 'peaGap',
+      title: 'Brecha PEA (M-F)',
+      icon: HiOutlineChartBar,
+      color: 'purple',
+      formatter: (value) => `${value.toFixed(1)}%`,
+      calculate: (latest, first) => ({
+        value: (latest?.participationRateMale || 0) - (latest?.participationRateFemale || 0),
+        firstValue: (first?.participationRateMale || 0) - (first?.participationRateFemale || 0)
+      })
+    },
+    {
+      id: 'salaryGap',
+      title: 'Brecha Salarial (M-F)',
+      icon: HiOutlineScale,
+      color: 'orange',
+      formatter: (value) => `$${value.toFixed(0)}`,
+      calculate: (latest, first) => ({
+        value: (latest?.salaryMale || 0) - (latest?.salaryFemale || 0),
+        firstValue: (first?.salaryMale || 0) - (first?.salaryFemale || 0)
+      })
+    },
+    {
+      id: 'malePEA',
+      title: 'PEA Masculina',
+      icon: HiOutlineUsers,
+      color: 'blue',
+      formatter: (value) => `${value.toFixed(1)}M`,
+      calculate: (latest, first) => ({
+        value: latest?.activePopMale || 0,
+        firstValue: first?.activePopMale || 0
+      })
+    },
+    {
+      id: 'femalePEA',
+      title: 'PEA Femenina',
+      icon: HiOutlineUsers,
+      color: 'purple',
+      formatter: (value) => `${value.toFixed(1)}M`,
+      calculate: (latest, first) => ({
+        value: latest?.activePopFemale || 0,
+        firstValue: first?.activePopFemale || 0
+      })
+    },
+    {
+      id: 'maleSalary',
+      title: 'Salario Masculino',
+      icon: HiOutlineCurrencyDollar,
+      color: 'green',
+      formatter: (value) => `$${value.toFixed(0)}`,
+      calculate: (latest, first) => ({
+        value: latest?.salaryMale || 0,
+        firstValue: first?.salaryMale || 0
+      })
+    },
+    {
+      id: 'femaleSalary',
+      title: 'Salario Femenino',
+      icon: HiOutlineCurrencyDollar,
+      color: 'orange',
+      formatter: (value) => `$${value.toFixed(0)}`,
+      calculate: (latest, first) => ({
+        value: latest?.salaryFemale || 0,
+        firstValue: first?.salaryFemale || 0
+      })
+    },
+    {
+      id: 'participationRatio',
+      title: 'Ratio PEA M/F',
+      icon: HiOutlineScale,
+      color: 'indigo',
+      formatter: (value) => `${value.toFixed(2)}:1`,
+      calculate: (latest, first) => ({
+        value: (latest?.activePopMale || 0) / (latest?.activePopFemale || 1),
+        firstValue: (first?.activePopMale || 0) / (first?.activePopFemale || 1)
+      })
+    },
+    {
+      id: 'salaryRatio',
+      title: 'Ratio Salario M/F',
+      icon: HiOutlineScale,
+      color: 'green',
+      formatter: (value) => `${value.toFixed(2)}:1`,
+      calculate: (latest, first) => ({
+        value: (latest?.salaryMale || 0) / (latest?.salaryFemale || 1),
+        firstValue: (first?.salaryMale || 0) / (first?.salaryFemale || 1)
+      })
+    },
+    {
+      id: 'yearRange',
+      title: 'Rango de Años',
+      icon: HiOutlineCalendar,
+      color: 'indigo',
+      formatter: (value) => value,
+      calculate: () => ({
+        value: `${selectedYearRange.start}-${selectedYearRange.end}`,
+        firstValue: null
+      })
+    },
+    {
+      id: 'dataPoints',
+      title: 'Puntos de Datos',
+      icon: HiOutlineTrendingUp,
+      color: 'blue',
+      formatter: (value) => value,
+      calculate: () => ({
+        value: processedData.length,
+        firstValue: null
+      })
+    }
+  ];
+
+  // Métricas seleccionadas por defecto (se pueden modificar fácilmente)
+  const [selectedMetrics, setSelectedMetrics] = useState([
+    'totalPEA', 'avgSalary', 'peaGap', 'salaryGap', 'yearRange', 'dataPoints'
+  ]);
+
+  // Configuraciones predefinidas de métricas
+  const metricsPresets = {
+    principales: ['totalPEA', 'avgSalary', 'peaGap', 'salaryGap'],
+    completas: ['totalPEA', 'avgSalary', 'peaGap', 'salaryGap', 'yearRange', 'dataPoints'],
+    genero: ['malePEA', 'femalePEA', 'maleSalary', 'femaleSalary'],
+    brechas: ['peaGap', 'salaryGap', 'participationRatio', 'salaryRatio'],
+    ratios: ['participationRatio', 'salaryRatio'],
+    todas: metricsConfig.map(m => m.id)
+  };
+
+  // Función para aplicar preset de métricas
+  const applyMetricsPreset = (presetName) => {
+    setSelectedMetrics(metricsPresets[presetName] || []);
+  };
+
+  // Función para calcular métricas dinámicamente
+  const calculateMetrics = useMemo(() => {
+    if (processedData.length === 0) return [];
+
+    const latestData = processedData[processedData.length - 1];
+    const firstData = processedData[0];
+
+    // Calcular tendencias
+    const calculateTrend = (latest, first) => {
+      if (!latest || !first || first === 0) return 0;
+      return ((latest - first) / first) * 100;
+    };
+
+    return selectedMetrics.map(metricId => {
+      const config = metricsConfig.find(m => m.id === metricId);
+      if (!config) return null;
+
+      const { value, firstValue } = config.calculate(latestData, firstData);
+      const trend = firstValue !== null ? calculateTrend(value, firstValue) : undefined;
+
+      return {
+        id: config.id,
+        title: config.title,
+        value: config.formatter(value),
+        icon: config.icon,
+        color: config.color,
+        trend: trend !== undefined ? trend.toFixed(1) : undefined
+      };
+    }).filter(Boolean);
+  }, [processedData, selectedYearRange, selectedMetrics]);
 
   // Componente de tooltip personalizado
   const CustomTooltip = ({ active, payload, label }) => {
@@ -306,28 +510,35 @@ const TimelineComparison = () => {
               Comparación Temporal: PEA vs Salarios
             </h2>
             <p className="text-gray-600 mt-1">
-              Análisis de población económicamente activa (15+ años) y salarios promedio por sexo
+              Análisis de población económicamente activa (15+ años) y salarios promedio por sexo (2010-2024)
             </p>
           </div>
         </div>
 
-        {/* Filtros integrados */}
-        <div className="glass-card p-6 mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            {/* Selector de país */}
-            <div className="flex items-center gap-2">
-              <HiOutlineFilter className="w-5 h-5 text-gray-500" />
-              <label className="text-sm font-medium text-gray-700">País:</label>
-              <select 
-                value={selectedCountry} 
-                onChange={(e) => setSelectedCountry(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {availableCountries.map(country => (
-                  <option key={country} value={country}>{country}</option>
-                ))}
-              </select>
-            </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <span className="ml-2 text-gray-600">Cargando datos...</span>
+          </div>
+        ) : (
+          <>
+            {/* Filtros integrados */}
+            <div className="glass-card p-6 mb-6">
+              <div className="flex flex-wrap gap-4 items-center">
+                {/* Selector de país */}
+                <div className="flex items-center gap-2">
+                  <HiOutlineFilter className="w-5 h-5 text-gray-500" />
+                  <label className="text-sm font-medium text-gray-700">País:</label>
+                  <select 
+                    value={selectedCountry} 
+                    onChange={(e) => setSelectedCountry(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {availableCountries.map(country => (
+                      <option key={country} value={country}>{country}</option>
+                    ))}
+                  </select>
+                </div>
 
             {/* Selector de rango de años */}
             <div className="flex items-center gap-2">
@@ -338,7 +549,7 @@ const TimelineComparison = () => {
                 onChange={(e) => setSelectedYearRange({...selectedYearRange, start: parseInt(e.target.value)})}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                {Array.from({length: 10}, (_, i) => 2015 + i).map(year => (
+                {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
@@ -348,89 +559,100 @@ const TimelineComparison = () => {
                 onChange={(e) => setSelectedYearRange({...selectedYearRange, end: parseInt(e.target.value)})}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                {Array.from({length: 10}, (_, i) => 2015 + i).map(year => (
+                {Array.from({length: availableYears.max - availableYears.min + 1}, (_, i) => availableYears.min + i).map(year => (
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
             </div>
+          </div>
 
-            {/* Selector de tipo de vista */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Vista:</label>
-              <select 
-                value={viewType} 
-                onChange={(e) => setViewType(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="combined">Combinada</option>
-                <option value="separate">Separada</option>
-                <option value="comparison">Comparación</option>
-              </select>
+          {/* Selector de métricas */}
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            <label className="text-sm font-medium text-gray-700">Métricas:</label>
+            <div className="flex flex-wrap gap-2">
+              {metricsConfig.slice(0, 8).map(metric => (
+                <button
+                  key={metric.id}
+                  onClick={() => {
+                    setSelectedMetrics(prev => 
+                      prev.includes(metric.id) 
+                        ? prev.filter(id => id !== metric.id)
+                        : [...prev, metric.id]
+                    );
+                  }}
+                  className={`px-3 py-1 text-xs rounded-full border transition-all duration-200 ${
+                    selectedMetrics.includes(metric.id)
+                      ? 'bg-blue-500 text-white border-blue-500'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-blue-500'
+                  }`}
+                >
+                  {metric.title}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Métricas clave */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="metric-card">
-            <div className="metric-icon bg-blue-100 text-blue-600">
-              <HiOutlineUsers className="w-5 h-5" />
-            </div>
-            <div className="metric-content">
-              <div className="metric-value">
-                {processedData.length > 0 ? 
-                  `${(processedData[processedData.length - 1]?.activePopMale + processedData[processedData.length - 1]?.activePopFemale || 0).toFixed(1)}M` : 
-                  'N/A'
-                }
-              </div>
-              <div className="metric-label">PEA Total Actual</div>
-            </div>
+        {/* Selector de vista de métricas */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Métricas seleccionadas:</span>
+            <span className="text-sm text-gray-500">
+              {selectedMetrics.length} de {metricsConfig.length} disponibles
+            </span>
           </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => applyMetricsPreset('todas')}
+              className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Todas
+            </button>
+            <button
+              onClick={() => applyMetricsPreset('principales')}
+              className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Principales
+            </button>
+            <button
+              onClick={() => applyMetricsPreset('genero')}
+              className="px-3 py-1 text-xs bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+            >
+              Por Género
+            </button>
+            <button
+              onClick={() => applyMetricsPreset('brechas')}
+              className="px-3 py-1 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Brechas
+            </button>
+            <button
+              onClick={() => applyMetricsPreset('ratios')}
+              className="px-3 py-1 text-xs bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+            >
+              Ratios
+            </button>
+          </div>
+        </div>
 
-          <div className="metric-card">
-            <div className="metric-icon bg-green-100 text-green-600">
-              <HiOutlineCurrencyDollar className="w-5 h-5" />
-            </div>
-            <div className="metric-content">
-              <div className="metric-value">
-                {processedData.length > 0 ? 
-                  `$${((processedData[processedData.length - 1]?.salaryMale + processedData[processedData.length - 1]?.salaryFemale || 0) / 2).toFixed(0)}` : 
-                  'N/A'
-                }
-              </div>
-              <div className="metric-label">Salario Promedio</div>
-            </div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-icon bg-purple-100 text-purple-600">
-              <HiOutlineUsers className="w-5 h-5" />
-            </div>
-            <div className="metric-content">
-              <div className="metric-value">
-                {processedData.length > 0 ? 
-                  `${((processedData[processedData.length - 1]?.participationRateMale || 0) - (processedData[processedData.length - 1]?.participationRateFemale || 0)).toFixed(1)}%` : 
-                  'N/A'
-                }
-              </div>
-              <div className="metric-label">Brecha PEA (M-F)</div>
-            </div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-icon bg-orange-100 text-orange-600">
-              <HiOutlineCurrencyDollar className="w-5 h-5" />
-            </div>
-            <div className="metric-content">
-              <div className="metric-value">
-                {processedData.length > 0 ? 
-                  `$${((processedData[processedData.length - 1]?.salaryMale || 0) - (processedData[processedData.length - 1]?.salaryFemale || 0)).toFixed(0)}` : 
-                  'N/A'
-                }
-              </div>
-              <div className="metric-label">Brecha Salarial (M-F)</div>
-            </div>
-          </div>
+        {/* Métricas clave dinámicas */}
+        <div className={`grid gap-4 mb-6 ${
+          selectedMetrics.length <= 2 ? 'grid-cols-1 md:grid-cols-2' :
+          selectedMetrics.length <= 3 ? 'grid-cols-1 md:grid-cols-3' :
+          selectedMetrics.length <= 4 ? 'grid-cols-2 md:grid-cols-4' :
+          selectedMetrics.length <= 6 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6' :
+          'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        }`}>
+          {calculateMetrics.map((metric) => (
+            <StatCard 
+              key={metric.id}
+              title={metric.title}
+              value={metric.value}
+              icon={metric.icon}
+              color={metric.color}
+              trend={metric.trend}
+            />
+          ))}
         </div>
 
         {/* Gráficos */}
@@ -599,9 +821,11 @@ const TimelineComparison = () => {
             </div>
           </div>
         </div>
-      </div>
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default TimelineComparison;
