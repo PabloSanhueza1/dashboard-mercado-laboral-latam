@@ -13,13 +13,13 @@ import { StatCard } from '../estadisticas/ResumenEstadisticas';
 
 const TimelineComparison = () => {
   const [selectedCountry, setSelectedCountry] = useState('Argentina');
-  const [selectedYearRange, setSelectedYearRange] = useState({ start: 2010, end: 2024 });
+  const [selectedYearRange, setSelectedYearRange] = useState({ start: 2010, end: 2023 });
 
   const [laborForceData, setLaborForceData] = useState([]);
   const [salaryData, setSalaryData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [availableCountries, setAvailableCountries] = useState([]);
-  const [availableYears, setAvailableYears] = useState({ min: 2010, max: 2024 });
+  const [availableYears, setAvailableYears] = useState({ min: 2010, max: 2023 });
 
   // Función para normalizar nombres de países
   const normalizeCountryName = (countryName) => {
@@ -27,7 +27,18 @@ const TimelineComparison = () => {
       'Brazil': 'Brasil',
       'Brasil': 'Brasil',
       'Peru': 'Perú',
-      'Perú': 'Perú'
+      'Perú': 'Perú',
+      'Bolivia (Plurinational State of)': 'Bolivia',
+      'Venezuela (Bolivarian Republic of)': 'Venezuela',
+      'Chile': 'Chile',
+      'Colombia': 'Colombia',
+      'Argentina': 'Argentina',
+      'Ecuador': 'Ecuador',
+      'Paraguay': 'Paraguay',
+      'Uruguay': 'Uruguay',
+      'Guyana': 'Guyana',
+      'Suriname': 'Suriname',
+      'French Guiana': 'Guayana Francesa'
     };
     return countryMap[countryName] || countryName;
   };
@@ -36,7 +47,18 @@ const TimelineComparison = () => {
   const getDatasetCountryName = (countryName) => {
     const reverseMap = {
       'Brasil': 'Brazil',
-      'Perú': 'Peru'
+      'Perú': 'Peru',
+      'Bolivia': 'Bolivia (Plurinational State of)',
+      'Venezuela': 'Venezuela (Bolivarian Republic of)',
+      'Chile': 'Chile',
+      'Colombia': 'Colombia',
+      'Argentina': 'Argentina',
+      'Ecuador': 'Ecuador',
+      'Paraguay': 'Paraguay',
+      'Uruguay': 'Uruguay',
+      'Guyana': 'Guyana',
+      'Suriname': 'Suriname',
+      'Guayana Francesa': 'French Guiana'
     };
     return reverseMap[countryName] || countryName;
   };
@@ -102,7 +124,7 @@ const TimelineComparison = () => {
           !isNaN(item.participationRate) &&
           item.ageGroup.includes('15+') && // Solo datos de 15+
           (item.sex === 'Male' || item.sex === 'Female') &&
-          item.year >= 2010 && item.year <= 2024 // Expandir rango de años
+          item.year >= 2000 && item.year <= 2024 // Rango más amplio para capturar más datos
         );
       
       console.log('Datos PEA cargados:', data.length, 'registros');
@@ -139,7 +161,7 @@ const TimelineComparison = () => {
           !isNaN(item.salary) &&
           item.currency.includes('U.S. dollars') && // Solo datos en USD
           (item.sex === 'Male' || item.sex === 'Female') &&
-          item.year >= 2010 && item.year <= 2024 // Expandir rango de años
+          item.year >= 2000 && item.year <= 2024 // Rango más amplio para capturar más datos
         );
       
       console.log('Datos salarios cargados:', data.length, 'registros');
@@ -242,6 +264,41 @@ const TimelineComparison = () => {
       2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
       2015: 31.2, 2016: 31.4, 2017: 31.6, 2018: 31.8, 2019: 32.0,
       2020: 32.2, 2021: 32.4, 2022: 32.6, 2023: 32.8, 2024: 33.0
+    },
+    'Bolivia': {
+      2010: 10.4, 2011: 10.6, 2012: 10.8, 2013: 11.0, 2014: 11.2,
+      2015: 11.4, 2016: 11.6, 2017: 11.8, 2018: 12.0, 2019: 12.2,
+      2020: 12.4, 2021: 12.6, 2022: 12.8, 2023: 13.0, 2024: 13.2
+    },
+    'Venezuela': {
+      2010: 29.0, 2011: 29.4, 2012: 29.8, 2013: 30.2, 2014: 30.6,
+      2015: 31.0, 2016: 31.4, 2017: 31.8, 2018: 32.2, 2019: 28.2,
+      2020: 28.4, 2021: 28.6, 2022: 28.8, 2023: 29.0, 2024: 29.2
+    },
+    'Ecuador': {
+      2010: 15.7, 2011: 15.9, 2012: 16.1, 2013: 16.3, 2014: 16.5,
+      2015: 16.8, 2016: 17.0, 2017: 17.2, 2018: 17.4, 2019: 17.6,
+      2020: 17.8, 2021: 18.0, 2022: 18.2, 2023: 18.4, 2024: 18.6
+    },
+    'Paraguay': {
+      2010: 6.5, 2011: 6.6, 2012: 6.7, 2013: 6.8, 2014: 6.9,
+      2015: 7.0, 2016: 7.1, 2017: 7.2, 2018: 7.3, 2019: 7.4,
+      2020: 7.5, 2021: 7.6, 2022: 7.7, 2023: 7.8, 2024: 7.9
+    },
+    'Uruguay': {
+      2010: 3.4, 2011: 3.4, 2012: 3.4, 2013: 3.4, 2014: 3.4,
+      2015: 3.5, 2016: 3.5, 2017: 3.5, 2018: 3.5, 2019: 3.5,
+      2020: 3.5, 2021: 3.5, 2022: 3.5, 2023: 3.5, 2024: 3.5
+    },
+    'Guyana': {
+      2010: 0.8, 2011: 0.8, 2012: 0.8, 2013: 0.8, 2014: 0.8,
+      2015: 0.8, 2016: 0.8, 2017: 0.8, 2018: 0.8, 2019: 0.8,
+      2020: 0.8, 2021: 0.8, 2022: 0.8, 2023: 0.8, 2024: 0.8
+    },
+    'Suriname': {
+      2010: 0.5, 2011: 0.5, 2012: 0.5, 2013: 0.5, 2014: 0.5,
+      2015: 0.6, 2016: 0.6, 2017: 0.6, 2018: 0.6, 2019: 0.6,
+      2020: 0.6, 2021: 0.6, 2022: 0.6, 2023: 0.6, 2024: 0.6
     }
   };
 
@@ -265,9 +322,10 @@ const TimelineComparison = () => {
         grouped[key] = { year: item.year };
       }
       
-      // Obtener población total estimada (buscar con ambos nombres)
+      // Obtener población total estimada (buscar con múltiples nombres posibles)
       const totalPopulation = populationData[item.country]?.[item.year] || 
-                             populationData[getDatasetCountryName(item.country)]?.[item.year] || 0;
+                             populationData[getDatasetCountryName(item.country)]?.[item.year] || 
+                             populationData[normalizeCountryName(item.country)]?.[item.year] || 0;
       
       // Calcular población económicamente activa en millones
       const activePop = (item.participationRate / 100) * totalPopulation;
@@ -510,7 +568,7 @@ const TimelineComparison = () => {
               Comparación Temporal: PEA vs Salarios
             </h2>
             <p className="text-gray-600 mt-1">
-              Análisis de población económicamente activa (15+ años) y salarios promedio por sexo (2010-2024)
+              Análisis de población económicamente activa (15+ años) y salarios promedio por sexo (2000-2024)
             </p>
           </div>
         </div>
@@ -636,13 +694,7 @@ const TimelineComparison = () => {
         </div>
 
         {/* Métricas clave dinámicas */}
-        <div className={`grid gap-4 mb-6 ${
-          selectedMetrics.length <= 2 ? 'grid-cols-1 md:grid-cols-2' :
-          selectedMetrics.length <= 3 ? 'grid-cols-1 md:grid-cols-3' :
-          selectedMetrics.length <= 4 ? 'grid-cols-2 md:grid-cols-4' :
-          selectedMetrics.length <= 6 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6' :
-          'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
-        }`}>
+        <div className="stats-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {calculateMetrics.map((metric) => (
             <StatCard 
               key={metric.id}
