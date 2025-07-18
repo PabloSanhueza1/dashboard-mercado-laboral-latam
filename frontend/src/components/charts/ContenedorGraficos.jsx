@@ -18,15 +18,14 @@ const ContenedorGraficos = ({
         loading={loading}
         error={error}
       />
+      {/* Análisis de Informalidad */}
+      <InformalityAnalysis />
 
       {/* Gráfico de Barras - Salario Mínimo vs Ingreso Promedio */}
       <GraficoBarrasSalarios />
 
       {/* Dot Plot - Participación Laboral por Género */}
       <DotPlotParticipacionLaboral />
-
-      {/* Análisis de Informalidad */}
-      <InformalityAnalysis />
 
       {/* Comparación de Líneas de Tiempo */}
       <TimelineComparison />
