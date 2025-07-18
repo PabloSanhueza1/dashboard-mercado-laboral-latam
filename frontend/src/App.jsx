@@ -73,7 +73,6 @@ const Dashboard = () => {
                 textAlign: 'center'
               }}
             >
-              <span role="img" aria-label="mapa" style={{ fontSize: 22, marginRight: 6 }}>🌍</span>
               Dashboard Mercado Laboral
             </h1>
             <div
