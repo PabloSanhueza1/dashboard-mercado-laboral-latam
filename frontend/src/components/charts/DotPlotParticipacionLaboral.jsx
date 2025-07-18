@@ -122,20 +122,60 @@ const DotPlotParticipacionLaboral = () => {
     // Bubble size: proporcional a la tasa (opcional)
     const getDotSize = rate => Math.max(16, Math.min(50, rate)); // Aumenta el tamaño mínimo a 16 y el máximo a 50
 
-    // Tooltip personalizado
-    const CustomTooltip = ({ active, payload }) => {
+    // Tooltip personalizado para mostrar ambos sexos
+    const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
-            const d = payload[0].payload;
+            // label es el grupo de edad
+            const ageGroup = label || (payload[0] && payload[0].payload && payload[0].payload.ageGroup);
+            // Busca ambos sexos en el grupo de edad actual
+            const male = filteredData.find(d => d.ageGroup === ageGroup && d.sex === "Male");
+            const female = filteredData.find(d => d.ageGroup === ageGroup && d.sex === "Female");
             return (
-                <div
-                    className="bg-white p-3 rounded shadow text-xs border border-gray-200"
-                    style={{ backgroundColor: "#fff" }}
-                >
-                    <div><b>País:</b> {countryDisplayNames[d.country] || d.country}</div>
-                    <div><b>Año:</b> {d.year}</div>
-                    <div><b>Grupo de edad:</b> {d.ageGroup}</div>
-                    <div><b>Sexo:</b> {sexDisplayNames[d.sex] || d.sex}</div>
-                    <div><b>Tasa de participación:</b> {d.rate}%</div>
+                <div style={{
+                    backgroundColor: 'white',
+                    border: '1px solid #ccc',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    minWidth: 180
+                }}>
+                    <div style={{ marginBottom: 4 }}>
+                        <b>{countryDisplayNames[selectedCountry] || selectedCountry}</b> | <span>{selectedYear}</span>
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                        <span style={{ color: '#555' }}>Grupo de edad:</span> <b>{ageGroup}</b>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{
+                                display: "inline-block",
+                                width: 12,
+                                height: 12,
+                                borderRadius: "50%",
+                                background: sexColors.Male,
+                                marginRight: 4,
+                                border: "1.5px solid #e5e7eb"
+                            }}></span>
+                            <span style={{ color: sexColors.Male, fontWeight: 600 }}>{sexDisplayNames["Male"]}:</span>
+                            <span style={{ marginLeft: 4 }}>
+                                {male ? `${male.rate.toFixed(3)}%` : <span style={{ color: "#bbb" }}>Sin datos</span>}
+                            </span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{
+                                display: "inline-block",
+                                width: 12,
+                                height: 12,
+                                borderRadius: "50%",
+                                background: sexColors.Female,
+                                marginRight: 4,
+                                border: "1.5px solid #e5e7eb"
+                            }}></span>
+                            <span style={{ color: sexColors.Female, fontWeight: 600 }}>{sexDisplayNames["Female"]}:</span>
+                            <span style={{ marginLeft: 4 }}>
+                                {female ? `${female.rate.toFixed(3)}%` : <span style={{ color: "#bbb" }}>Sin datos</span>}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             );
         }

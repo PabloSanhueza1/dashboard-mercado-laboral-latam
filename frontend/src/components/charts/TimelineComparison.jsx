@@ -478,28 +478,6 @@ const TimelineComparison = () => {
       })
     },
     {
-      id: 'participationRatio',
-      title: 'Ratio PEA M/F',
-      icon: HiOutlineScale,
-      color: 'indigo',
-      formatter: (value) => `${value.toFixed(2)}:1`,
-      calculate: (latest, first) => ({
-        value: (latest?.activePopMale || 0) / (latest?.activePopFemale || 1),
-        firstValue: (first?.activePopMale || 0) / (first?.activePopFemale || 1)
-      })
-    },
-    {
-      id: 'salaryRatio',
-      title: 'Ratio Salario M/F',
-      icon: HiOutlineScale,
-      color: 'green',
-      formatter: (value) => `${value.toFixed(2)}:1`,
-      calculate: (latest, first) => ({
-        value: (latest?.salaryMale || 0) / (latest?.salaryFemale || 1),
-        firstValue: (first?.salaryMale || 0) / (first?.salaryFemale || 1)
-      })
-    },
-    {
       id: 'yearRange',
       title: 'Rango de Años',
       icon: HiOutlineCalendar,
@@ -533,8 +511,7 @@ const TimelineComparison = () => {
     principales: ['totalPEA', 'avgSalary', 'peaGap', 'salaryGap'],
     completas: ['totalPEA', 'avgSalary', 'peaGap', 'salaryGap', 'yearRange', 'dataPoints'],
     genero: ['malePEA', 'femalePEA', 'maleSalary', 'femaleSalary'],
-    brechas: ['peaGap', 'salaryGap', 'participationRatio', 'salaryRatio'],
-    ratios: ['participationRatio', 'salaryRatio'],
+    brechas: ['peaGap', 'salaryGap'],
     todas: metricsConfig.map(m => m.id)
   };
 
@@ -658,49 +635,6 @@ const TimelineComparison = () => {
                       </button>
                     ))}
                   </div>
-                </div>
-              </div>
-
-              {/* Slider de intervalo de años */}
-              <div className="flex flex-col items-center w-full mt-4">
-                <label className="text-xs text-gray-500 mb-1">
-                  Rango de años:
-                </label>
-                <div className="flex items-center gap-2" style={{ width: 180 }}>
-                  <span className="text-xs text-blue-700 font-semibold">{selectedYearRange.start}</span>
-                  <Range
-                    step={1}
-                    min={0}
-                    max={availableYearsArray.length - 1}
-                    values={sliderValues}
-                    onChange={handleSliderChange}
-                    renderTrack={({ props, children }) => (
-                      <div
-                        {...props}
-                        style={{
-                          ...props.style,
-                          height: 4,
-                          width: '100%',
-                          background: 'linear-gradient(90deg,#e0e7ff 0%,#2563eb 100%)',
-                          borderRadius: 8,
-                        }}
-                      >{children}</div>
-                    )}
-                    renderThumb={({ props }) => (
-                      <div
-                        {...props}
-                        style={{
-                          ...props.style,
-                          height: 14,
-                          width: 14,
-                          backgroundColor: '#2563eb',
-                          borderRadius: '50%',
-                          border: '2px solid #fff',
-                        }}
-                      />
-                    )}
-                  />
-                  <span className="text-xs text-blue-700 font-semibold">{selectedYearRange.end}</span>
                 </div>
               </div>
 
@@ -880,35 +814,6 @@ const TimelineComparison = () => {
                 >
                   Brechas
                 </button>
-                <button
-                  onClick={() => applyMetricsPreset('ratios')}
-                  type="button"
-                  style={{
-                    backgroundColor:
-                      selectedMetrics.length === metricsPresets.ratios.length &&
-                      metricsPresets.ratios.every(id => selectedMetrics.includes(id))
-                        ? '#007bff'
-                        : '#fff',
-                    color:
-                      selectedMetrics.length === metricsPresets.ratios.length &&
-                      metricsPresets.ratios.every(id => selectedMetrics.includes(id))
-                        ? '#fff'
-                        : '#007bff',
-                    border: '1px solid #007bff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: 'normal',
-                    fontSize: '16px',
-                    boxShadow: 'none',
-                    cursor: 'pointer',
-                    minWidth: 90,
-                    outline: 'none',
-                    margin: '8px 8px 8px 0',
-                  }}
-                  className="transition-colors"
-                >
-                  Ratios
-                </button>
               </div>
             </div>
 
@@ -940,6 +845,8 @@ const TimelineComparison = () => {
                       dataKey="year"
                       stroke="#666"
                       fontSize={12}
+                      interval={0}
+                      padding={{ left: 10, right: 10 }} // <-- Añade espacio a los extremos
                     />
                     <YAxis
                       stroke="#666"
@@ -976,6 +883,8 @@ const TimelineComparison = () => {
                       dataKey="year"
                       stroke="#666"
                       fontSize={12}
+                      interval={0}
+                      padding={{ left: 10, right: 10 }} // <-- Añade espacio a los extremos
                     />
                     <YAxis
                       stroke="#666"
@@ -1005,6 +914,51 @@ const TimelineComparison = () => {
               </div>
             </div>
 
+            {/* Slider de intervalo de años debajo de los gráficos */}
+            <div className="flex flex-col items-center w-full mt-6 mb-6">
+              <label className="text-xs text-gray-500 mb-1 text-center">
+                Rango de años:
+              </label>
+              <div className="flex justify-center w-full">
+                <div className="flex items-center gap-2" style={{ width: 260 }}>
+                  <span className="text-xs text-blue-700 font-semibold">{selectedYearRange.start}</span>
+                  <Range
+                    step={1}
+                    min={0}
+                    max={availableYearsArray.length - 1}
+                    values={sliderValues}
+                    onChange={handleSliderChange}
+                    renderTrack={({ props, children }) => (
+                      <div
+                        {...props}
+                        style={{
+                          ...props.style,
+                          height: 4,
+                          width: '100%',
+                          background: 'linear-gradient(90deg,#fed7aa 0%,#ea580c 100%)',
+                          borderRadius: 8,
+                        }}
+                      >{children}</div>
+                    )}
+                    renderThumb={({ props }) => (
+                      <div
+                        {...props}
+                        style={{
+                          ...props.style,
+                          height: 14,
+                          width: 14,
+                          backgroundColor: '#ea580c',
+                          borderRadius: '50%',
+                          border: '2px solid #fff',
+                        }}
+                      />
+                    )}
+                  />
+                  <span className="text-xs text-blue-700 font-semibold">{selectedYearRange.end}</span>
+                </div>
+              </div>
+            </div>
+
             {/* Panel de información */}
             <div className="bg-white border border-gray-200 rounded-xl mt-8 shadow-sm">
               <div className="flex justify-center">
@@ -1016,6 +970,9 @@ const TimelineComparison = () => {
                     backgroundColor: '#fff5f0',
                     borderColor: '#fed7aa',
                     color: '#ea580c',
+                    margin: '0 auto', // centra el botón
+                    display: 'flex',
+                    justifyContent: 'center',
                   }}
                   aria-label="Mostrar información del análisis"
                 >
@@ -1029,7 +986,7 @@ const TimelineComparison = () => {
                     </p>
                   </div>
                   <div className="text-orange-600">
-                    <HiChevronDown 
+                    <HiChevronDown
                       className={`w-5 h-5 transition-transform duration-200 ${showInfoPanel ? 'rotate-180' : ''}`}
                     />
                   </div>
@@ -1049,7 +1006,7 @@ const TimelineComparison = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
                         <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
@@ -1060,7 +1017,7 @@ const TimelineComparison = () => {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start gap-3">
                         <div className="w-3 h-3 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
                         <div>
@@ -1072,7 +1029,7 @@ const TimelineComparison = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                 </div>
               )}
             </div>

@@ -47,31 +47,36 @@ const InformalityAnalysis = () => {
     return years;
   }, [csvData]);
 
-  // Procesar datos para gráficos
+  // Procesar datos para gráficos, asegurando que todos los países estén presentes
   const processedData = useMemo(() => {
     if (!csvData || csvData.length === 0) return [];
-    // Filtrar por año y países conocidos
-    const yearData = csvData.filter(d =>
-      d.time === selectedYear &&
-      Object.keys(countryDisplayNames).includes(d['ref_area.label'])
-    );
-    // Agrupar por país
+    // Filtrar por año
+    const yearData = csvData.filter(d => d.time === selectedYear);
+    // Inicializar todos los países
+    const allCountries = Object.values(countryDisplayNames);
     const grouped = {};
+    allCountries.forEach(country => {
+      grouped[country] = { country, Male: null, Female: null, Total: null };
+    });
     yearData.forEach(item => {
       const country = countryDisplayNames[item['ref_area.label']];
-      if (!grouped[country]) grouped[country] = { country };
-      grouped[country][item['sex.label']] = parseFloat(item.obs_value);
+      if (country) {
+        grouped[country][item['sex.label']] = parseFloat(item.obs_value);
+      }
     });
     return Object.values(grouped);
   }, [csvData, selectedYear]);
 
-  // Datos para comparación de brechas de género
+  // Datos para comparación de brechas de género, asegurando todos los países
   const genderGapData = useMemo(() => {
     return processedData.map(item => ({
       country: item.country,
-      Male: item.Male || 0,
-      Female: item.Female || 0,
-      gap: (item.Female || 0) - (item.Male || 0)
+      Male: item.Male,
+      Female: item.Female,
+      gap:
+        item.Female != null && item.Male != null
+          ? item.Female - item.Male
+          : null
     }));
   }, [processedData]);
 
@@ -91,6 +96,57 @@ const InformalityAnalysis = () => {
     };
   }, [processedData, selectedYear]);
 
+  // Tooltip personalizado para mostrar "Sin datos" si corresponde
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload || payload.length === 0) return null;
+    return (
+      <div style={{
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        padding: '10px',
+        borderRadius: '5px',
+        minWidth: 160
+      }}>
+        <div style={{ marginBottom: 4 }}>
+          <b>{label}</b>
+        </div>
+        {payload.map((entry, idx) => (
+          <div key={idx} style={{ color: entry.color, marginBottom: 2 }}>
+            <span style={{ fontWeight: 600 }}>{entry.name}:</span>{" "}
+            {entry.value == null || isNaN(entry.value)
+              ? <span style={{ color: "#bbb" }}>Sin datos</span>
+              : `${entry.value.toFixed(1)}%`}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Tooltip para brecha de género
+  const CustomGapTooltip = ({ active, payload, label }) => {
+    if (!active || !payload || payload.length === 0) return null;
+    const entry = payload[0];
+    return (
+      <div style={{
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        padding: '10px',
+        borderRadius: '5px',
+        minWidth: 160
+      }}>
+        <div style={{ marginBottom: 4 }}>
+          <b>{label}</b>
+        </div>
+        <div>
+          <span style={{ fontWeight: 600 }}>Diferencia (F-M):</span>{" "}
+          {entry.value == null || isNaN(entry.value)
+            ? <span style={{ color: "#bbb" }}>Sin datos</span>
+            : `${entry.value.toFixed(1)}%`}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="chart-container">
       {/* Header y controles */}
@@ -98,79 +154,6 @@ const InformalityAnalysis = () => {
         <h2 className="text-xl font-bold text-gray-900 mb-4">
           Análisis de informalidad laboral por sexo
         </h2>
-        <div className="flex flex-wrap gap-4 mb-4">
-          <div>
-            {/* Slider de año con diseño DotPlot */}
-            {availableYears.length > 0 && (
-              <div className="flex flex-col items-center w-full">
-                <label className="text-xs text-gray-500 mb-2">
-                  Año: <span className="font-semibold text-blue-700">{selectedYear}</span>
-                </label>
-                <div className="flex items-center w-96 max-w-full">
-                  <span className="text-xs text-gray-400 mr-2">{availableYears[0]}</span>
-                  <input
-                    type="range"
-                    min={0}
-                    max={availableYears.length - 1}
-                    value={availableYears.indexOf(selectedYear)}
-                    onChange={e => setSelectedYear(availableYears[parseInt(e.target.value)])}
-                    className="w-full h-3 accent-orange-500"
-                    style={{
-                      appearance: "none",
-                      background: "linear-gradient(90deg,#fde68a 0%,#ea580c 100%)",
-                      borderRadius: "999px",
-                      outline: "none",
-                      boxShadow: "0 1px 4px rgba(234,88,12,0.10)",
-                    }}
-                  />
-                  <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
-                </div>
-                <style>{`
-                  input[type="range"]::-webkit-slider-thumb {
-                    appearance: none;
-                    width: 18px;
-                    height: 18px;
-                    background: #ea580c;
-                    border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(234,88,12,0.15);
-                    border: 2px solid #fff;
-                    cursor: pointer;
-                    transition: background 0.2s;
-                  }
-                  input[type="range"]:focus::-webkit-slider-thumb {
-                    background: #b45309;
-                  }
-                  input[type="range"]::-moz-range-thumb {
-                    width: 18px;
-                    height: 18px;
-                    background: #ea580c;
-                    border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(234,88,12,0.15);
-                    border: 2px solid #fff;
-                    cursor: pointer;
-                    transition: background 0.2s;
-                  }
-                  input[type="range"]:focus::-moz-range-thumb {
-                    background: #b45309;
-                  }
-                  input[type="range"]::-ms-thumb {
-                    width: 18px;
-                    height: 18px;
-                    background: #ea580c;
-                    border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(234,88,12,0.15);
-                    border: 2px solid #fff;
-                    cursor: pointer;
-                    transition: background 0.2s;
-                  }
-                  input[type="range"]:focus::-ms-thumb {
-                    background: #b45309;
-                  }
-                `}</style>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Métricas clave estilo mapacoropletico */}
@@ -221,6 +204,7 @@ const InformalityAnalysis = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="country" />
               <YAxis
+                domain={[0, 100]}
                 label={{
                   value: 'Tasa de informalidad (%)',
                   angle: -90,
@@ -229,7 +213,7 @@ const InformalityAnalysis = () => {
                   dy: 100,
                 }}
               />
-              <Tooltip formatter={(value) => [`${value?.toFixed(1)}%`, 'Tasa de Informalidad']} />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Bar dataKey="Male" fill="#3B82F6" name="Hombres" />
               <Bar dataKey="Female" fill="#EF4444" name="Mujeres" />
@@ -247,6 +231,7 @@ const InformalityAnalysis = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="country" />
               <YAxis
+                domain={[-15, 15]}
                 label={{
                   value: 'Diferencia (%)',
                   angle: -90,
@@ -255,7 +240,7 @@ const InformalityAnalysis = () => {
                   dy: 100,
                 }}
               />
-              <Tooltip formatter={(value) => [`${value?.toFixed(1)}%`, 'Diferencia']} />
+              <Tooltip content={<CustomGapTooltip />} />
               <Bar
                 dataKey="gap"
                 fill="#F59E0B"
@@ -265,6 +250,76 @@ const InformalityAnalysis = () => {
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Slider de año debajo de los gráficos */}
+      {availableYears.length > 0 && (
+        <div className="flex flex-col items-center w-full mt-8">
+          <label className="text-xs text-gray-500 mb-2">
+            Año: <span className="font-semibold text-blue-700">{selectedYear}</span>
+          </label>
+          <div className="flex items-center w-96 max-w-full">
+            <span className="text-xs text-gray-400 mr-2">{availableYears[0]}</span>
+            <input
+              type="range"
+              min={0}
+              max={availableYears.length - 1}
+              value={availableYears.indexOf(selectedYear)}
+              onChange={e => setSelectedYear(availableYears[parseInt(e.target.value)])}
+              className="w-full h-3 accent-orange-500"
+              style={{
+                appearance: "none",
+                background: "linear-gradient(90deg,#fde68a 0%,#ea580c 100%)",
+                borderRadius: "999px",
+                outline: "none",
+                boxShadow: "0 1px 4px rgba(234,88,12,0.10)",
+              }}
+            />
+            <span className="text-xs text-gray-400 ml-2">{availableYears[availableYears.length - 1]}</span>
+          </div>
+          <style>{`
+            input[type="range"]::-webkit-slider-thumb {
+              appearance: none;
+              width: 18px;
+              height: 18px;
+              background: #ea580c;
+              border-radius: 50%;
+              box-shadow: 0 2px 8px rgba(234,88,12,0.15);
+              border: 2px solid #fff;
+              cursor: pointer;
+              transition: background 0.2s;
+            }
+            input[type="range"]:focus::-webkit-slider-thumb {
+              background: #b45309;
+            }
+            input[type="range"]::-moz-range-thumb {
+              width: 18px;
+              height: 18px;
+              background: #ea580c;
+              border-radius: 50%;
+              box-shadow: 0 2px 8px rgba(234,88,12,0.15);
+              border: 2px solid #fff;
+              cursor: pointer;
+              transition: background 0.2s;
+            }
+            input[type="range"]:focus::-moz-range-thumb {
+              background: #b45309;
+            }
+            input[type="range"]::-ms-thumb {
+              width: 18px;
+              height: 18px;
+              background: #ea580c;
+              border-radius: 50%;
+              box-shadow: 0 2px 8px rgba(234,88,12,0.15);
+              border: 2px solid #fff;
+              cursor: pointer;
+              transition: background 0.2s;
+            }
+            input[type="range"]:focus::-ms-thumb {
+              background: #b45309;
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 };
