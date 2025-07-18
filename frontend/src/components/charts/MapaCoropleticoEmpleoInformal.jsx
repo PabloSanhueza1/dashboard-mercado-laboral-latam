@@ -76,35 +76,16 @@ const MapaCoropleticoEmpleoInformal = ({ data, loading = false, error = null }) 
           locations.push(countryCode);
           values.push(row.value);
 
-          // Categorizar el nivel de informalidad
-          let categoria = '';
-          let emoji = '';
-          if (row.value >= 70) {
-            categoria = 'Muy Alta';
-            emoji = '🔴';
-          } else if (row.value >= 50) {
-            categoria = 'Alta';
-            emoji = '🟠';
-          } else if (row.value >= 30) {
-            categoria = 'Moderada';
-            emoji = '🟡';
-          } else {
-            categoria = 'Baja';
-            emoji = '🟢';
-          }
-
           hoverText.push(
             `<b>${displayName}</b><br>` +
             `Año: ${row.year}<br>` +
-            `Tasa de empleo informal: <b>${row.value.toFixed(1)}%</b><br>` +
-            `Nivel: ${emoji} ${categoria}<br>`
+            `Tasa de empleo informal: <b>${row.value.toFixed(1)}%</b><br>`
           );
 
           customData.push({
             country: displayName,
             value: row.value,
             year: row.year,
-            categoria: categoria
           });
         }
       });
