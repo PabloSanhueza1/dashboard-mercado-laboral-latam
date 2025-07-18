@@ -83,10 +83,15 @@ const InformalityAnalysis = () => {
   // Métricas clave adaptadas al estilo del mapa coroplético
   const stats = useMemo(() => {
     if (!processedData || processedData.length === 0) return null;
-    const totalValues = processedData.map(d => d.Total || 0);
-    const promedio = totalValues.reduce((sum, val) => sum + val, 0) / totalValues.length;
-    const maximo = Math.max(...totalValues);
-    const minimo = Math.min(...totalValues);
+    // Filtrar solo valores válidos (no null, no undefined, no NaN)
+    const totalValues = processedData
+      .map(d => d.Total)
+      .filter(val => val !== null && val !== undefined && !isNaN(val));
+    const promedio = totalValues.length > 0
+      ? totalValues.reduce((sum, val) => sum + val, 0) / totalValues.length
+      : 0;
+    const maximo = totalValues.length > 0 ? Math.max(...totalValues) : 0;
+    const minimo = totalValues.length > 0 ? Math.min(...totalValues) : 0;
     return {
       paises: processedData.length,
       promedio: promedio.toFixed(1),
